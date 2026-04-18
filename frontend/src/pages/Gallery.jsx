@@ -14,6 +14,7 @@ export default function Gallery() {
   const search = searchParams.get("search") || "";
   const id_prodi = searchParams.get("id_prodi") || "";
   const tipe = searchParams.get("tipe") || "";
+  const tahun = searchParams.get("tahun") || "";
   const page = searchParams.get("page") || 1;
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function Gallery() {
     if (search) params.set("search", search);
     if (id_prodi) params.set("id_prodi", id_prodi);
     if (tipe) params.set("tipe", tipe);
+    if (tahun) params.set("tahun", tahun);
     params.set("page", page);
     params.set("per_page", 12);
 
@@ -36,7 +38,7 @@ export default function Gallery() {
         setMeta(data.meta || data);
       })
       .finally(() => setLoading(false));
-  }, [search, id_prodi, tipe, page]);
+  }, [search, id_prodi, tipe, tahun, page]);
 
   const setParam = (key, val) => {
     const p = new URLSearchParams(searchParams);
@@ -114,8 +116,28 @@ export default function Gallery() {
                 🎲 3D Model
               </option>
             </select>
+            {/* Year filter */}
+            {/* <select
+              value={tahun}
+              onChange={(e) => setParam("tahun", e.target.value)}
+              className="input text-sm w-auto min-w-[120px]"
+            >
+              <option value="" className="text-black">
+                Semua Tahun
+              </option>
+              {Array.from(
+                { length: new Date().getFullYear() - 2019 },
+                (_, i) => 2020 + i,
+              )
+                .reverse()
+                .map((year) => (
+                  <option key={year} value={year} className="text-black">
+                    {year}
+                  </option>
+                ))}
+            </select> */}
             {/* Reset */}
-            {(search || id_prodi || tipe) && (
+            {(search || id_prodi || tipe || tahun) && (
               <button
                 onClick={() => setSearchParams({})}
                 className="btn-secondary text-sm py-2"
@@ -135,7 +157,11 @@ export default function Gallery() {
         ) : artworks.length === 0 ? (
           <div className="text-center py-20">
             <span className="text-5xl mb-4 block">🔍</span>
-            <p className="text-white/50">Tidak ada karya yang ditemukan</p>   
+            <p className="text-white/50">
+              {tahun
+                ? "Karya tidak ditemukan di tahun tersebut"
+                : "Tidak ada karya yang ditemukan"}
+            </p>
           </div>
         ) : (
           <>

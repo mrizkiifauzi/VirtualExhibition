@@ -16,24 +16,46 @@ class ArtworkController extends Controller
         if ($request->id_prodi) {
             $query->where('id_prodi', $request->id_prodi);
         }
+
         if ($request->search) {
             $query->where('judul', 'like', '%' . $request->search . '%');
         }
+
         if ($request->tipe) {
             $query->where('tipe', $request->tipe);
         }
 
+        if ($request->tahun) {
+            $query->whereYear('created_at', $request->tahun);
+        }
+
+        if ($request->sort === 'best') {
+            $query->where(function ($q) {
+                $q->whereHas('ratings')
+                  ->orWhereHas('likes');
+            })
+                  ->orderBy('ratings_avg_nilai', 'desc')
+                  ->orderBy('likes_count', 'desc');
+        } else {
+            $query->latest();
+        }
+
         $artworks = $query->withCount(['likes', 'comments'])
             ->withAvg('ratings', 'nilai')
-            ->latest()
             ->paginate(12);
 
-        // Append user's like/rating if logged in
+        // Tambahkan info user (like & rating)
         if (auth('sanctum')->check()) {
             $userId = auth('sanctum')->id();
-            $artworks->getCollection()->transform(function ($artwork) use ($userId) {
-                $artwork->user_liked  = $artwork->likes()->where('id_user', $userId)->exists();
-                $artwork->user_rating = $artwork->ratings()->where('id_user', $userId)->value('nilai');
+
+            $artworks->getCollection()->load([
+                'likes' => fn($q) => $q->where('id_user', $userId),
+                'ratings' => fn($q) => $q->where('id_user', $userId),
+            ]);
+
+            $artworks->getCollection()->transform(function ($artwork) {
+                $artwork->user_liked  = $artwork->likes->isNotEmpty();
+                $artwork->user_rating = optional($artwork->ratings->first())->nilai;
                 return $artwork;
             });
         }
@@ -43,15 +65,23 @@ class ArtworkController extends Controller
 
     public function show($id)
     {
-        $artwork = Artwork::with(['user:id_user,name,nim,foto_profil', 'programStudi:id_prodi,nama_prodi'])
+        $artwork = Artwork::with([
+            'user:id_user,name,nim,foto_profil',
+            'programStudi:id_prodi,nama_prodi'
+        ])
             ->withCount(['likes', 'comments'])
             ->withAvg('ratings', 'nilai')
-            //   ->where('status', 'verified')
             ->findOrFail($id);
 
-        // Kirim error jika orang lain mencoba akses karya yang belum verified
-        if ($artwork->status !== 'verified' && (!auth('sanctum')->check() || auth('sanctum')->id() !== $artwork->id_user)) {
-            if (auth('sanctum')->user()->role !== 'admin') {
+        // Proteksi karya yang belum verified
+        if ($artwork->status !== 'verified') {
+            if (!auth('sanctum')->check()) {
+                abort(404, 'Karya belum diverifikasi');
+            }
+
+            $user = auth('sanctum')->user();
+
+            if ($user->id_user !== $artwork->id_user && $user->role !== 'admin') {
                 abort(404, 'Karya belum diverifikasi');
             }
         }
@@ -77,15 +107,18 @@ class ArtworkController extends Controller
         ]);
 
         $user = $request->user();
-        if ($user->role !== 'mahasiswa' && $user->role !== 'admin') {
+
+        if (!in_array($user->role, ['mahasiswa', 'admin'])) {
             return response()->json(['message' => 'Hanya mahasiswa yang dapat mengupload karya.'], 403);
         }
 
+        // Upload file
         $filePath = $request->file('file')->store('artworks/files', 'public');
-        $thumbnailPath = null;
-        if ($request->hasFile('thumbnail')) {
-            $thumbnailPath = $request->file('thumbnail')->store('artworks/thumbnails', 'public');
-        }
+
+        // Upload thumbnail (optional)
+        $thumbnailPath = $request->hasFile('thumbnail')
+            ? $request->file('thumbnail')->store('artworks/thumbnails', 'public')
+            : null;
 
         $artwork = Artwork::create([
             'id_user'    => $user->id_user,
@@ -98,7 +131,10 @@ class ArtworkController extends Controller
             'status'     => 'pending',
         ]);
 
-        return response()->json(['message' => 'Karya berhasil diupload, menunggu verifikasi.', 'artwork' => $artwork], 201);
+        return response()->json([
+            'message' => 'Karya berhasil diupload, menunggu verifikasi.',
+            'artwork' => $artwork
+        ], 201);
     }
 
     public function update(Request $request, $id)
@@ -118,7 +154,10 @@ class ArtworkController extends Controller
 
         $artwork->update($request->only(['judul', 'deskripsi', 'id_prodi']));
 
-        return response()->json(['message' => 'Karya berhasil diupdate.', 'artwork' => $artwork]);
+        return response()->json([
+            'message' => 'Karya berhasil diupdate.',
+            'artwork' => $artwork
+        ]);
     }
 
     public function destroy(Request $request, $id)
@@ -130,7 +169,9 @@ class ArtworkController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        // Hapus file
         Storage::disk('public')->delete($artwork->file_path);
+
         if ($artwork->thumbnail) {
             Storage::disk('public')->delete($artwork->thumbnail);
         }

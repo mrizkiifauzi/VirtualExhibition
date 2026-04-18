@@ -10,11 +10,33 @@ class Artwork extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_user', 'id_prodi', 'judul', 'deskripsi',
-        'tipe', 'file_path', 'thumbnail', 'status', 'posisi_3d',
+        'id_user',
+        'id_prodi',
+        'judul',
+        'deskripsi',
+        'tipe',
+        'tahun',
+        'file_path',
+        'thumbnail',
+        'status',
+        'posisi_3d',
     ];
 
-    protected $casts = ['posisi_3d' => 'array'];
+    protected $casts = [
+        'posisi_3d' => 'array',
+    ];
+
+    // Tambahkan otomatis ke JSON response
+    protected $appends = [
+        'file_url',
+        'thumbnail_url',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
 
     public function user()
     {
@@ -39,5 +61,25 @@ class Artwork extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class, 'artwork_id');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSORS (URL FILE)
+    |--------------------------------------------------------------------------
+    */
+
+    public function getFileUrlAttribute()
+    {
+        return $this->file_path
+            ? asset('storage/' . $this->file_path)
+            : null;
+    }
+
+    public function getThumbnailUrlAttribute()
+    {
+        return $this->thumbnail
+            ? asset('storage/' . $this->thumbnail)
+            : null;
     }
 }

@@ -72,6 +72,7 @@ export default function Login() {
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="label">Email</label>
+
               <input
                 name="email"
                 type="email"
@@ -93,7 +94,7 @@ export default function Login() {
                 type="password"
                 value={form.password}
                 onChange={handle}
-                className="input"
+                className="input "
                 placeholder="••••••••"
                 required
               />

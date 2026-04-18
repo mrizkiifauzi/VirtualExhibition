@@ -4,38 +4,38 @@ import Navbar from "../components/common/Navbar";
 import ArtworkCard from "../components/artwork/ArtworkCard";
 import api from "../api/axios";
 
-const JURUSAN = [
-  {
-    icon: "💻",
-    color: "from-blue-900/50 to-indigo-900/50",
-    border: "border-blue-500/30",
-  },
-  {
-    icon: "📊",
-    color: "from-green-900/50 to-teal-900/50",
-    border: "border-green-500/30",
-  },
-  {
-    icon: "🎨",
-    color: "from-pink-900/50 to-rose-900/50",
-    border: "border-pink-500/30",
-  },
-  {
-    icon: "🏭",
-    color: "from-orange-900/50 to-amber-900/50",
-    border: "border-orange-500/30",
-  },
-  {
-    icon: "🎬",
-    color: "from-purple-900/50 to-violet-900/50",
-    border: "border-purple-500/30",
-  },
-  {
-    icon: "⚙️",
-    color: "from-cyan-900/50 to-sky-900/50",
-    border: "border-cyan-500/30",
-  },
-];
+// const JURUSAN = [
+//   {
+//     icon: "💻",
+//     color: "from-blue-900/50 to-indigo-900/50",
+//     border: "border-blue-500/30",
+//   },
+//   {
+//     icon: "📊",
+//     color: "from-green-900/50 to-teal-900/50",
+//     border: "border-green-500/30",
+//   },
+//   {
+//     icon: "🎨",
+//     color: "from-pink-900/50 to-rose-900/50",
+//     border: "border-pink-500/30",
+//   },
+//   {
+//     icon: "🏭",
+//     color: "from-orange-900/50 to-amber-900/50",
+//     border: "border-orange-500/30",
+//   },
+//   {
+//     icon: "🎬",
+//     color: "from-purple-900/50 to-violet-900/50",
+//     border: "border-purple-500/30",
+//   },
+//   {
+//     icon: "⚙️",
+//     color: "from-cyan-900/50 to-sky-900/50",
+//     border: "border-cyan-500/30",
+//   },
+// ];
 
 export default function Home() {
   const [prodis, setProdis] = useState([]);
@@ -66,7 +66,7 @@ export default function Home() {
   useEffect(() => {
     Promise.all([
       api.get("/program-studi"),
-      api.get("/artworks?per_page=6"),
+      api.get("/artworks?sort=best&tipe=image&per_page=6"),
       api.get("/stats"),
     ])
       .then(([prodiRes, artRes, statsRes]) => {
@@ -180,7 +180,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-3xl font-bold text-white">Karya Terbaik</h2>
+              <h2 className="text-3xl font-bold text-white">
+                Karya Terbaik Mahasiswa
+              </h2>
             </div>
             <Link
               to="/gallery"
@@ -190,7 +192,7 @@ export default function Home() {
             </Link>
           </div>
 
-          {loading ? (
+          {/* {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div
@@ -205,7 +207,7 @@ export default function Home() {
                 <ArtworkCard key={a.id} artwork={a} />
               ))}
             </div>
-          )}
+          )} */}
         </div>
       </section>
 

@@ -16,13 +16,14 @@ use App\Http\Controllers\Admin\AdminController;
 // Public Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
-Route::post('/forgot-password', [ForgotPasswordController::class, 'sendLink']);
-Route::post('/reset-password',  [ForgotPasswordController::class, 'reset']);
+Route::post('/forgot-password',      [ForgotPasswordController::class, 'sendLink']);
+Route::post('/reset-password',       [ForgotPasswordController::class, 'reset']);
+Route::post('/reset-password/check', [ForgotPasswordController::class, 'checkToken']);
 
 // Public Artworks
 Route::get('/artworks',              [ArtworkController::class, 'index']);
 Route::get('/artworks/{id}',         [ArtworkController::class, 'show']);
-Route::get('/artworks/{id}/comments',[CommentController::class, 'index']);
+Route::get('/artworks/{id}/comments', [CommentController::class, 'index']);
 Route::get('/program-studi',         [ProgramStudiController::class, 'index']);
 Route::get('/stats',                 [SiteStatsController::class, 'index']);
 
@@ -50,7 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/artworks',              [AdminController::class, 'artworks']);
         Route::put('/artworks/{id}/verify',  [AdminController::class, 'verify']);
         Route::put('/artworks/{id}/reject',  [AdminController::class, 'reject']);
-        Route::put('/artworks/{id}/position',[AdminController::class, 'setPosition']);
+        Route::put('/artworks/{id}/position', [AdminController::class, 'setPosition']);
         Route::delete('/artworks/{id}',      [AdminController::class, 'deleteArtwork']);
         Route::get('/users',                 [AdminController::class, 'users']);
         Route::put('/users/{id}/role',       [AdminController::class, 'updateRole']);
