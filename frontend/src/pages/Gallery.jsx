@@ -117,7 +117,7 @@ export default function Gallery() {
               </option>
             </select>
             {/* Year filter */}
-            {/* <select
+            <select
               value={tahun}
               onChange={(e) => setParam("tahun", e.target.value)}
               className="input text-sm w-auto min-w-[120px]"
@@ -135,7 +135,7 @@ export default function Gallery() {
                     {year}
                   </option>
                 ))}
-            </select> */}
+            </select>
             {/* Reset */}
             {(search || id_prodi || tipe || tahun) && (
               <button
