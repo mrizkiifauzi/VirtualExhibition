@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import ArtworkCard from "../components/artwork/ArtworkCard";
 import api from "../api/axios";
+import useAuthStore from "../store/authStore";
 
 // const JURUSAN = [
 //   {
@@ -43,6 +44,7 @@ export default function Home() {
   const [artworksByProdi, setArtworksByProdi] = useState({});
   const [stats, setStats] = useState({ artworks: null, users: null });
   const [loading, setLoading] = useState(true);
+  const { isLoggedIn, isMahasiswa, isAdmin } = useAuthStore();
   const useTypewriter = (text, speed = 50) => {
     const [displayText, setDisplayText] = useState("");
 
@@ -249,28 +251,34 @@ export default function Home() {
       })} */}
 
       {/* CTA */}
-      <section className="py-20 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="card p-10">
-            <span className="text-5xl mb-4 block">🚀</span>
-            <h2 className="text-3xl font-bold text-white mb-3">
-              Siap Showcase Karyamu?
-            </h2>
-            <p className="text-white/60 mb-8">
-              Daftar sebagai mahasiswa dan upload karya terbaikmu untuk
-              ditampilkan di galeri virtual kami.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link to="/register" className="btn-primary px-6 py-2.5">
-                Daftar Sekarang
-              </Link>
-              <Link to="/gallery" className="btn-secondary px-6 py-2.5">
-                Jelajahi Galeri
-              </Link>
+      {!isAdmin() && (
+        <section className="py-20 px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="card p-10">
+              <span className="text-5xl mb-4 block">🚀</span>
+              <h2 className="text-3xl font-bold text-white mb-3">
+                Siap Showcase Karyamu?
+              </h2>
+              <p className="text-white/60 mb-8">
+                {isMahasiswa()
+                  ? "Upload karya terbaikmu untuk ditampilkan di galeri virtual kami."
+                  : "Daftar sebagai mahasiswa dan upload karya terbaikmu untuk ditampilkan di galeri virtual kami."}
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Link
+                  to={isMahasiswa() ? "/upload" : "/register"}
+                  className="btn-primary px-6 py-2.5"
+                >
+                  {isMahasiswa() ? "Upload Karyamu Sekarang" : "Daftar Sekarang"}
+                </Link>
+                <Link to="/gallery" className="btn-secondary px-6 py-2.5">
+                  Jelajahi Galeri
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-white/10 py-8 text-center text-white/30 text-sm">

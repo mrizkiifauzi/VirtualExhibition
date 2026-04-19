@@ -52,21 +52,18 @@ export default function Gallery() {
     <div className="min-h-screen bg-gray-950 pt-16">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-10">
-        {/* Header */} 
+        {/* Header */}
         <div className="mb-8">
-           <h1 className="text-3xl font-bold text-white">Galeri Karya</h1>   {" "}
+          <h1 className="text-3xl font-bold text-white">Galeri Karya</h1>
           <p className="text-white/50 mt-1">
             Temukan karya-karya inspiratif dari mahasiswa kami
           </p>
-           
         </div>
-        {/* Filters */} 
+        {/* Filters */}
         <div className="card p-4 mb-8">
-           
           <div className="flex flex-wrap gap-3 items-center">
             {/* Search */}
             <div className="flex-1 min-w-[200px]">
-               
               <input
                 type="text"
                 placeholder="Cari judul karya..."
@@ -112,9 +109,9 @@ export default function Gallery() {
               <option value="video" className="text-black">
                 🎬 Video
               </option>
-              <option value="3d" className="text-black">
+              {/* <option value="3d" className="text-black">
                 🎲 3D Model
-              </option>
+              </option> */}
             </select>
             {/* Year filter */}
             <select
