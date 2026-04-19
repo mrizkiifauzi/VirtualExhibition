@@ -112,8 +112,16 @@ class ArtworkController extends Controller
             return response()->json(['message' => 'Hanya mahasiswa yang dapat mengupload karya.'], 403);
         }
 
+        // Tentukan direktori berdasarkan tipe file
+        $directory = match($request->tipe) {
+            'image' => 'artworks/img',
+            'video' => 'artworks/video',
+            '3d' => 'artworks/3d',
+            default => 'artworks/files',
+        };
+
         // Upload file
-        $filePath = $request->file('file')->store('artworks/files', 'public');
+        $filePath = $request->file('file')->store($directory, 'public');
 
         // Upload thumbnail (optional)
         $thumbnailPath = $request->hasFile('thumbnail')

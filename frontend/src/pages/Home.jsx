@@ -45,19 +45,36 @@ export default function Home() {
   const [stats, setStats] = useState({ artworks: null, users: null });
   const [loading, setLoading] = useState(true);
   const { isLoggedIn, isMahasiswa, isAdmin } = useAuthStore();
-  const useTypewriter = (text, speed = 50) => {
+  const useTypewriter = (text, speed = 50, delayAfterComplete = 1000) => {
     const [displayText, setDisplayText] = useState("");
 
     useEffect(() => {
       let i = 0;
-      const timer = setInterval(() => {
-        setDisplayText(text.substring(0, i + 1));
-        i++;
-        if (i >= text.length) clearInterval(timer);
-      }, speed);
+      let timer;
+      let timeoutId;
 
-      return () => clearInterval(timer);
-    }, [text, speed]);
+      const startTyping = () => {
+        timer = setInterval(() => {
+          setDisplayText(text.substring(0, i + 1));
+          i++;
+          if (i >= text.length) {
+            clearInterval(timer);
+            // Jeda sebelum mulai ulang
+            timeoutId = setTimeout(() => {
+              i = 0;
+              startTyping();
+            }, delayAfterComplete);
+          }
+        }, speed);
+      };
+
+      startTyping();
+
+      return () => {
+        clearInterval(timer);
+        clearTimeout(timeoutId);
+      };
+    }, [text, speed, delayAfterComplete]);
 
     return displayText;
   };
@@ -194,7 +211,7 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* {loading ? (
+          {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div
@@ -209,7 +226,7 @@ export default function Home() {
                 <ArtworkCard key={a.id} artwork={a} />
               ))}
             </div>
-          )} */}
+          )}
         </div>
       </section>
 
@@ -269,7 +286,9 @@ export default function Home() {
                   to={isMahasiswa() ? "/upload" : "/register"}
                   className="btn-primary px-6 py-2.5"
                 >
-                  {isMahasiswa() ? "Upload Karyamu Sekarang" : "Daftar Sekarang"}
+                  {isMahasiswa()
+                    ? "Upload Karyamu Sekarang"
+                    : "Daftar Sekarang"}
                 </Link>
                 <Link to="/gallery" className="btn-secondary px-6 py-2.5">
                   Jelajahi Galeri
