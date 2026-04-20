@@ -60,10 +60,9 @@ export default function Login() {
         {/* Back link */}
         <p className="text-left text-sm text-white/50 mt-5 mb-4">
           <Link
-            to="/home"
+            to="/"
             className="text-primary-400 hover:text-primary-300 font-medium"
           >
-            {" "}
             ← Kembali
           </Link>
         </p>
