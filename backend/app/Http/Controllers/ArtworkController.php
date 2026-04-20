@@ -10,8 +10,13 @@ class ArtworkController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Artwork::with(['user:id_user,name,nim', 'programStudi:id_prodi,nama_prodi'])
-            ->where('status', 'verified');
+        $query = Artwork::with(['user:id_user,name,nim', 'programStudi:id_prodi,nama_prodi']);
+
+        if ($request->my && auth('sanctum')->check()) {
+            $query->where('id_user', auth('sanctum')->id());
+        } else {
+            $query->where('status', 'verified');
+        }
 
         if ($request->id_prodi) {
             $query->where('id_prodi', $request->id_prodi);
@@ -32,10 +37,10 @@ class ArtworkController extends Controller
         if ($request->sort === 'best') {
             $query->where(function ($q) {
                 $q->whereHas('ratings')
-                  ->orWhereHas('likes');
+                    ->orWhereHas('likes');
             })
-                  ->orderBy('ratings_avg_nilai', 'desc')
-                  ->orderBy('likes_count', 'desc');
+                ->orderBy('ratings_avg_nilai', 'desc')
+                ->orderBy('likes_count', 'desc');
         } else {
             $query->latest();
         }
@@ -113,7 +118,7 @@ class ArtworkController extends Controller
         }
 
         // Tentukan direktori berdasarkan tipe file
-        $directory = match($request->tipe) {
+        $directory = match ($request->tipe) {
             'image' => 'artworks/img',
             'video' => 'artworks/video',
             '3d' => 'artworks/3d',
