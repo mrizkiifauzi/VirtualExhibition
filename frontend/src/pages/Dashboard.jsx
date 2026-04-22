@@ -6,7 +6,7 @@ import useAuthStore from "../store/authStore";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:8000/storage";
+const API_URL = "http://localhost:8000";
 
 function StatusBadge({ status }) {
   const map = {
@@ -235,3 +235,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+

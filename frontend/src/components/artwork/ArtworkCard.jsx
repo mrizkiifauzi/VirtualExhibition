@@ -3,7 +3,7 @@ import { useState } from "react";
 import React from "react";
 import LikeButton from "../interactions/LikeButton";
 
-const API_URL = "http://localhost:8000/public"; // Sesuaikan dengan URL backend Anda
+const API_URL = "http://localhost:8000"; // Sesuaikan dengan URL backend
 
 function ArtworkCard({ artwork }) {
   const [loaded, setLoaded] = useState(false);

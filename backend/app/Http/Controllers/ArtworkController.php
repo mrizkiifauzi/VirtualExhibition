@@ -126,12 +126,37 @@ class ArtworkController extends Controller
         };
 
         // Upload file
-        $filePath = $request->file('file')->store($directory, 'public');
+        $file = $request->file('file');
+        $filename = time() . '_' . $file->getClientOriginalName();
+
+        // buat folder jika belum ada
+        $destination = public_path($directory);
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        // pindahkan file ke public/artworks
+        $file->move($destination, $filename);
+
+        // simpan path ke database
+        $filePath = $directory . '/' . $filename;
 
         // Upload thumbnail (optional)
-        $thumbnailPath = $request->hasFile('thumbnail')
-            ? $request->file('thumbnail')->store('artworks/thumbnails', 'public')
-            : null;
+        $thumbnailPath = null;
+
+        if ($request->hasFile('thumbnail')) {
+            $thumb = $request->file('thumbnail');
+            $thumbName = time() . '_thumb_' . $thumb->getClientOriginalName();
+
+            $thumbDir = public_path('artworks/thumbnails');
+            if (!file_exists($thumbDir)) {
+                mkdir($thumbDir, 0755, true);
+            }
+
+            $thumb->move($thumbDir, $thumbName);
+
+            $thumbnailPath = 'artworks/thumbnails/' . $thumbName;
+        }
 
         $artwork = Artwork::create([
             'id_user'    => $user->id_user,
@@ -183,10 +208,16 @@ class ArtworkController extends Controller
         }
 
         // Hapus file
-        Storage::disk('public')->delete($artwork->file_path);
+        $filePath = public_path($artwork->file_path);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
 
         if ($artwork->thumbnail) {
-            Storage::disk('public')->delete($artwork->thumbnail);
+            $thumbPath = public_path($artwork->thumbnail);
+            if (file_exists($thumbPath)) {
+                unlink($thumbPath);
+            }
         }
 
         $artwork->delete();

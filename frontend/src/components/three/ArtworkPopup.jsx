@@ -5,7 +5,7 @@ import RatingStars from "../interactions/RatingStars";
 import LoginModal from "../common/LoginModal";
 import { useState } from "react";
 
-const API_URL = "http://localhost:8000/storage";
+const API_URL = "http://localhost:8000";
 
 export default function ArtworkPopup({ artwork, onClose }) {
   const navigate = useNavigate();
@@ -123,3 +123,5 @@ export default function ArtworkPopup({ artwork, onClose }) {
     </>
   );
 }
+
+

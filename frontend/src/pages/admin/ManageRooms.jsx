@@ -4,7 +4,7 @@ import Navbar from '../../components/common/Navbar'
 import api from '../../api/axios'
 import toast from 'react-hot-toast'
 
-const API_URL = 'http://localhost:8000/storage'
+const API_URL = 'http://localhost:8000'
 
 // Preset positions for the virtual room
 const PRESETS = [
@@ -194,3 +194,5 @@ export default function ManageRooms() {
     </div>
   )
 }
+
+

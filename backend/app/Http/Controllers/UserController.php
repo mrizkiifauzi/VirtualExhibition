@@ -25,10 +25,25 @@ class UserController extends Controller
         $data = $request->only(['name', 'nim', 'id_prodi']);
 
         if ($request->hasFile('foto_profil')) {
+            // Hapus file lama jika ada
             if ($user->foto_profil) {
-                Storage::disk('public')->delete($user->foto_profil);
+                $oldPath = public_path($user->foto_profil);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
             }
-            $data['foto_profil'] = $request->file('foto_profil')->store('profiles', 'public');
+
+            // Upload file baru ke public/profiles
+            $foto = $request->file('foto_profil');
+            $fotoName = time() . '_' . $foto->getClientOriginalName();
+
+            $fotoDir = public_path('profiles');
+            if (!file_exists($fotoDir)) {
+                mkdir($fotoDir, 0755, true);
+            }
+
+            $foto->move($fotoDir, $fotoName);
+            $data['foto_profil'] = 'profiles/' . $fotoName;
         }
 
         $user->update($data);

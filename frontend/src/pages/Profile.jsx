@@ -4,7 +4,7 @@ import useAuthStore from '../store/authStore'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 
-const API_URL = 'http://localhost:8000/storage'
+const API_URL = 'http://localhost:8000'
 
 export default function Profile() {
   const { user, updateUser } = useAuthStore()

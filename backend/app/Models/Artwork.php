@@ -72,14 +72,14 @@ class Artwork extends Model
     public function getFileUrlAttribute()
     {
         return $this->file_path
-            ? asset('storage/' . $this->file_path)
+            ? asset('public/' . $this->file_path)
             : null;
     }
 
     public function getThumbnailUrlAttribute()
     {
         return $this->thumbnail
-            ? asset('storage/' . $this->thumbnail)
+            ? asset('public/' . $this->thumbnail)
             : null;
     }
 }

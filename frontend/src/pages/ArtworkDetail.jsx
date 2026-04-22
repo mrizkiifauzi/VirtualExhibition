@@ -6,7 +6,7 @@ import RatingStars from '../components/interactions/RatingStars'
 import CommentSection from '../components/interactions/CommentSection'
 import api from '../api/axios'
 
-const API_URL = 'http://localhost:8000/storage'
+const API_URL = 'http://localhost:8000'
 
 export default function ArtworkDetail() {
   const { id } = useParams()
