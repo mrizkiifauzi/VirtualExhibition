@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -10,14 +11,16 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Seed 6 Program Studi
+        // Seed 8 Program Studi
         $prodis = [
-            ['nama_prodi' => 'Teknik Informatika',        'jenjang' => 'S1'],
-            ['nama_prodi' => 'Sistem Informasi',          'jenjang' => 'S1'],
-            ['nama_prodi' => 'Desain Komunikasi Visual',  'jenjang' => 'S1'],
-            ['nama_prodi' => 'Desain Produk',             'jenjang' => 'S1'],
+            ['nama_prodi' => 'Teknik Informatika',        'jenjang' => 'D3'],
             ['nama_prodi' => 'Animasi',                   'jenjang' => 'D4'],
+            ['nama_prodi' => 'Rekayasa Keamanan Siber',   'jenjang' => 'D4'],
+            ['nama_prodi' => 'Teknik Komputer',           'jenjang' => 'S2'],
+            ['nama_prodi' => 'Teknologi Geomatika',       'jenjang' => 'D3'],
             ['nama_prodi' => 'Rekayasa Perangkat Lunak',  'jenjang' => 'D4'],
+            ['nama_prodi' => 'Teknologi Rekayasa Multimedia',  'jenjang' => 'D4'],
+            ['nama_prodi' => 'Teknologi Permainan',  'jenjang' => 'D4'],
         ];
         foreach ($prodis as $prodi) {
             ProgramStudi::firstOrCreate(['nama_prodi' => $prodi['nama_prodi']], $prodi);

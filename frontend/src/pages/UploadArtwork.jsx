@@ -86,9 +86,9 @@ export default function UploadArtwork() {
   const accept = {
     image: ".jpg,.jpeg,.png",
     video: ".mp4",
-    "3d": ".glb,.gltf",
+    // "3d": ".glb,.gltf",
   };
-  const tipeIcon = { image: "🖼️", video: "🎬", "3d": "🎲" };
+  const tipeIcon = { image: "🖼️", video: "🎬" };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -104,7 +104,7 @@ export default function UploadArtwork() {
     fd.append("judul", form.judul);
     fd.append("deskripsi", form.deskripsi);
     fd.append("tipe", form.tipe);
-    fd.append("id_prodi", form.id_prodi || "");
+    // fd.append("id_prodi", form.id_prodi || "");
     fd.append("file", file);
     if (thumb) fd.append("thumbnail", thumb);
 
@@ -126,23 +126,23 @@ export default function UploadArtwork() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 pt-16">
+    <div className="min-h-screen pt-16 bg-gray-950">
       <Navbar />
-      <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="max-w-2xl px-4 py-10 mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Upload Karya</h1>
-          <p className="text-white/50 mt-1">
+          <p className="mt-1 text-white/50">
             Karya akan diverifikasi admin sebelum ditampilkan
           </p>
         </div>
 
-        <div className="card p-8">
+        <div className="p-8 card">
           <form onSubmit={submit} className="space-y-5">
             {/* ── Tipe ── */}
             <div>
               <label className="label">Tipe Karya</label>
-              <div className="grid grid-cols-3 gap-3">
-                {["image", "video", "3d"].map((t) => (
+              <div className="grid grid-cols-2 gap-3">
+                {["image", "video"].map((t) => (
                   <button
                     key={t}
                     type="button"
@@ -153,7 +153,7 @@ export default function UploadArtwork() {
                         : "border-white/10 bg-white/5 text-white/50 hover:border-white/30"
                     }`}
                   >
-                    <div className="text-2xl mb-1">{tipeIcon[t]}</div>
+                    <div className="mb-1 text-2xl">{tipeIcon[t]}</div>
                     <div className="text-xs font-medium capitalize">
                       {t === "3d" ? "3D Model" : t}
                     </div>
@@ -173,7 +173,7 @@ export default function UploadArtwork() {
                 required
               />
               {errors.judul && (
-                <p className="text-red-400 text-xs mt-1">{errors.judul[0]}</p>
+                <p className="mt-1 text-xs text-red-400">{errors.judul[0]}</p>
               )}
             </div>
 
@@ -191,7 +191,7 @@ export default function UploadArtwork() {
             </div>
 
             {/* ── Program Studi ── */}
-            <div>
+            {/* <div>
               <label className="label">Program Studi</label>
               <select
                 value={form.id_prodi}
@@ -205,7 +205,7 @@ export default function UploadArtwork() {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
 
             {/* ── File Upload ──
                   FIXED: input is hidden via ref, NOT via absolute positioning.
@@ -240,7 +240,7 @@ export default function UploadArtwork() {
                     <img
                       src={filePreview}
                       alt="Preview"
-                      className="max-h-48 mx-auto rounded-lg"
+                      className="mx-auto rounded-lg max-h-48"
                     />
                     <p className="text-xs text-white/50">{file?.name}</p>
                   </div>
@@ -264,24 +264,18 @@ export default function UploadArtwork() {
                 {/* Button triggers file input via ref */}
                 <button
                   type="button"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
                   className="mt-4 btn-secondary text-sm py-1.5 px-5"
                 >
                   {file ? "Ganti File" : "Pilih File"}
                 </button>
               </div>
 
-              {/* Hidden file input — controlled by ref only */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept={accept[form.tipe]}
-                onChange={handleFile}
-                className="hidden"
-              />
-
               {errors.file && (
-                <p className="text-red-400 text-xs mt-1">{errors.file[0]}</p>
+                <p className="mt-1 text-xs text-red-400">{errors.file[0]}</p>
               )}
             </div>
 
@@ -304,13 +298,13 @@ export default function UploadArtwork() {
                     <img
                       src={thumbPreview}
                       alt="Thumbnail"
-                      className="w-20 h-20 object-cover rounded-xl"
+                      className="object-cover w-20 h-20 rounded-xl"
                     />
                   )}
                   <button
                     type="button"
                     onClick={() => thumbInputRef.current?.click()}
-                    className="btn-secondary text-sm py-2 px-4"
+                    className="px-4 py-2 text-sm btn-secondary"
                   >
                     {thumb ? "Ganti Thumbnail" : "Pilih Thumbnail"}
                   </button>
@@ -321,13 +315,13 @@ export default function UploadArtwork() {
             {/* ── Upload progress ── */}
             {loading && progress > 0 && (
               <div>
-                <div className="flex justify-between text-xs text-white/50 mb-1">
+                <div className="flex justify-between mb-1 text-xs text-white/50">
                   <span>Mengupload...</span>
                   <span>{progress}%</span>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-2">
+                <div className="w-full h-2 rounded-full bg-white/10">
                   <div
-                    className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+                    className="h-2 transition-all duration-300 rounded-full bg-primary-500"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -335,7 +329,7 @@ export default function UploadArtwork() {
             )}
 
             {/* ── Info ── */}
-            <div className="p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl text-xs text-blue-300">
+            <div className="p-3 text-xs text-blue-300 border bg-blue-900/20 border-blue-500/20 rounded-xl">
               📋 Karya Anda akan direview oleh admin sebelum ditampilkan di
               galeri. Proses biasanya 1-2 hari kerja.
             </div>
@@ -343,7 +337,7 @@ export default function UploadArtwork() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-3"
+              className="w-full py-3 btn-primary"
             >
               {loading ? `Mengupload... ${progress}%` : "📤 Upload Karya"}
             </button>

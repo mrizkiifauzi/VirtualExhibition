@@ -19,8 +19,4 @@ class ProgramStudi extends Model
     {
         return $this->hasMany(Artwork::class, 'id_prodi', 'id_prodi');
     }
-    public function kurikulum()
-    {
-        return $this->hasMany(Kurikulum::class, 'id_prodi', 'id_prodi');
-    }
 }

@@ -36,20 +36,17 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b bg-gray-950/80 backdrop-blur-md border-white/10">
+      <div className="flex items-center justify-between h-16 px-4 mx-auto max-w-7xl">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-            VE
-          </div>
-          <span className="font-bold text-white hidden sm:block">
+        <Link to="/" className="flex items-center">
+          <span className="hidden font-bold text-white sm:block">
             Virtual Exhibition
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="items-center hidden gap-1 md:flex">
           {navLink("/", "Beranda")}
           {navLink("/gallery", "Galeri")}
           {navLink("/exhibition", "Pameran 3D")}
@@ -65,7 +62,7 @@ export default function Navbar() {
                 onClick={() => setDropOpen(!dropOpen)}
                 className="flex items-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl px-3 py-1.5 transition-all"
               >
-                <div className="w-7 h-7 bg-primary-600 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                <div className="flex items-center justify-center text-xs font-bold text-white rounded-full w-7 h-7 bg-primary-600">
                   {/* PERBAIKAN: Gunakan optional chaining dan fallback string */}
                   {user?.name?.charAt(0).toUpperCase() || "?"}
                 </div>
@@ -88,26 +85,26 @@ export default function Navbar() {
                 </svg>
               </button>
               {dropOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-xl shadow-2xl py-1 z-50">
+                <div className="absolute right-0 z-50 w-48 py-1 mt-2 bg-gray-900 border shadow-2xl border-white/10 rounded-xl">
                   <div className="px-4 py-2 border-b border-white/10">
                     <p className="text-sm font-medium text-white truncate">
                       {user?.name}
                     </p>
-                    <p className="text-xs text-white/40 capitalize">
+                    <p className="text-xs capitalize text-white/40">
                       {user?.role}
                     </p>
                   </div>
                   <Link
                     to="/dashboard"
                     onClick={() => setDropOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 text-sm transition-all text-white/70 hover:text-white hover:bg-white/10"
                   >
                     <span>📊</span> Dashboard
                   </Link>
                   <Link
                     to="/profile"
                     onClick={() => setDropOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 text-sm transition-all text-white/70 hover:text-white hover:bg-white/10"
                   >
                     <span>👤</span> Profil & Password
                   </Link>
@@ -115,7 +112,7 @@ export default function Navbar() {
                     <Link
                       to="/upload"
                       onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                      className="flex items-center gap-2 px-4 py-2 text-sm transition-all text-white/70 hover:text-white hover:bg-white/10"
                     >
                       <span>📤</span> Upload Karya
                     </Link>
@@ -124,14 +121,14 @@ export default function Navbar() {
                     <Link
                       to="/admin"
                       onClick={() => setDropOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                      className="flex items-center gap-2 px-4 py-2 text-sm transition-all text-white/70 hover:text-white hover:bg-white/10"
                     >
                       <span>⚙️</span> Admin Panel
                     </Link>
                   )}
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-white/10 transition-all"
+                    className="flex items-center w-full gap-2 px-4 py-2 text-sm text-red-400 transition-all hover:text-red-300 hover:bg-white/10"
                   >
                     <span>🚪</span> Logout
                   </button>
@@ -150,7 +147,7 @@ export default function Navbar() {
           {/* Mobile menu toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-white p-1"
+            className="p-1 text-white md:hidden"
           >
             <svg
               className="w-6 h-6"
@@ -173,7 +170,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-gray-950/95 border-t border-white/10 px-4 py-3 flex flex-col gap-1">
+        <div className="flex flex-col gap-1 px-4 py-3 border-t md:hidden bg-gray-950/95 border-white/10">
           {navLink("/", "Beranda")}
           {navLink("/gallery", "Galeri")}
           {navLink("/exhibition", "Pameran 3D")}

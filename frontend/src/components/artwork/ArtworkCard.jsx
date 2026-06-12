@@ -15,10 +15,10 @@ function ArtworkCard({ artwork }) {
       ? `${API_URL}/${artwork.file_path}`
       : null;
 
-  const typeIcon = { image: "🖼️", video: "🎬", "3d": "🎲" };
+  const typeIcon = { image: "🖼️", video: "🎬" };
 
   return (
-    <div className="card overflow-hidden group hover:border-primary-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary-900/20">
+    <div className="overflow-hidden transition-all duration-300 card group hover:border-primary-500/50 hover:shadow-lg hover:shadow-primary-900/20">
       {/* Thumbnail */}
       <div className="relative aspect-[4/3] bg-gray-900 overflow-hidden">
         {/* Skeleton */}
@@ -39,7 +39,7 @@ function ArtworkCard({ artwork }) {
               group-hover:scale-105`}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="flex items-center justify-center w-full h-full">
             <span className="text-5xl opacity-30">
               {typeIcon[artwork.tipe]}
             </span>
@@ -47,7 +47,7 @@ function ArtworkCard({ artwork }) {
         )}
 
         {/* Type badge */}
-        <span className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+        <span className="absolute px-2 py-1 text-xs text-white rounded-full top-2 right-2 bg-black/60 backdrop-blur-sm">
           {typeIcon[artwork.tipe]} {artwork.tipe.toUpperCase()}
         </span>
       </div>
@@ -55,21 +55,21 @@ function ArtworkCard({ artwork }) {
       {/* Info */}
       <div className="p-4">
         <Link to={`/artworks/${artwork.id}`}>
-          <h3 className="font-semibold text-white group-hover:text-primary-400 transition-colors line-clamp-1 mb-1">
+          <h3 className="mb-1 font-semibold text-white transition-colors group-hover:text-primary-400 line-clamp-1">
             {artwork.judul}
           </h3>
         </Link>
 
-        <p className="text-xs text-white/50 mb-1">{artwork.user?.name}</p>
+        <p className="mb-1 text-xs text-white/50">{artwork.user?.name}</p>
 
         {artwork.program_studi && (
-          <p className="text-xs text-primary-400/70 mb-3">
+          <p className="mb-3 text-xs text-primary-400/70">
             {artwork.program_studi.nama_prodi}
           </p>
         )}
 
         {artwork.deskripsi && (
-          <p className="text-sm text-white/50 line-clamp-2 mb-3">
+          <p className="mb-3 text-sm text-white/50 line-clamp-2">
             {artwork.deskripsi}
           </p>
         )}
