@@ -206,7 +206,6 @@
         <!-- Logo -->
         <div class="header">
             <div class="logo-badge">
-                <div class="logo-icon">VE</div>
                 <span class="logo-text">Virtual Exhibition</span>
             </div>
         </div>

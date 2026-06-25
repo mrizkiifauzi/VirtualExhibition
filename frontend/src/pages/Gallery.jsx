@@ -49,26 +49,26 @@ export default function Gallery() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 pt-16">
+    <div className="min-h-screen pt-16 bg-gray-950">
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="px-4 py-10 mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Galeri Karya</h1>
-          <p className="text-white/50 mt-1">
+          <p className="mt-1 text-white/50">
             Temukan karya-karya inspiratif dari mahasiswa kami
           </p>
         </div>
         {/* Filters */}
-        <div className="card p-4 mb-8">
-          <div className="flex flex-wrap gap-3 items-center">
+        <div className="p-4 mb-8 card">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Search */}
             <div className="flex-1 min-w-[200px]">
               <input
                 type="text"
                 placeholder="Cari judul karya..."
                 defaultValue={search}
-                className="input text-sm"
+                className="text-sm input"
                 onKeyDown={(e) =>
                   e.key === "Enter" && setParam("search", e.target.value)
                 }
@@ -82,7 +82,7 @@ export default function Gallery() {
               className="input text-sm w-auto min-w-[180px]"
             >
               <option value="" className="text-black">
-                Semua Jurusan
+                Semua Program Studi
               </option>
               {prodis.map((p) => (
                 <option
@@ -98,7 +98,7 @@ export default function Gallery() {
             <select
               value={tipe}
               onChange={(e) => setParam("tipe", e.target.value)}
-              className="input text-sm w-auto"
+              className="w-auto text-sm input"
             >
               <option value="" className="text-black">
                 Semua Tipe
@@ -137,7 +137,7 @@ export default function Gallery() {
             {(search || id_prodi || tipe || tahun) && (
               <button
                 onClick={() => setSearchParams({})}
-                className="btn-secondary text-sm py-2"
+                className="py-2 text-sm btn-secondary"
               >
                 Reset Filter
               </button>
@@ -146,14 +146,14 @@ export default function Gallery() {
         </div>
         {/* Results */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(12)].map((_, i) => (
               <div key={i} className="card aspect-[4/3] animate-pulse" />
             ))}
           </div>
         ) : artworks.length === 0 ? (
-          <div className="text-center py-20">
-            <span className="text-5xl mb-4 block">🔍</span>
+          <div className="py-20 text-center">
+            <span className="block mb-4 text-5xl">🔍</span>
             <p className="text-white/50">
               {tahun
                 ? "Karya tidak ditemukan di tahun tersebut"
@@ -162,10 +162,10 @@ export default function Gallery() {
           </div>
         ) : (
           <>
-            <p className="text-sm text-white/40 mb-4">
+            <p className="mb-4 text-sm text-white/40">
               {meta?.total || artworks.length} karya ditemukan
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {artworks.map((a) => (
                 <ArtworkCard key={a.id} artwork={a} />
               ))}

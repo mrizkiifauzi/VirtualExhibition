@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Artwork;
 use App\Models\User;
+use App\Notifications\ArtworkRejectedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,8 +26,8 @@ class AdminController extends Controller
     public function artworks(Request $request)
     {
         $query = Artwork::with(['user:id_user,name,nim', 'programStudi:id_prodi,nama_prodi'])
-                        ->withCount(['likes', 'comments'])
-                        ->withAvg('ratings', 'nilai');
+            ->withCount(['likes', 'comments'])
+            ->withAvg('ratings', 'nilai');
 
         if ($request->status) $query->where('status', $request->status);
         if ($request->search) $query->where('judul', 'like', '%' . $request->search . '%');
@@ -43,9 +44,21 @@ class AdminController extends Controller
 
     public function reject(Request $request, $id)
     {
-        $artwork = Artwork::findOrFail($id);
+        $request->validate([
+            'message' => 'required|string|min:10',
+        ], [
+            'message.required' => 'Alasan penolakan harus diisi.',
+            'message.min' => 'Tuliskan alasan yang spesifik terhadap karya ini.',
+        ]);
+
+        $artwork = Artwork::with('user')->findOrFail($id);
         $artwork->update(['status' => 'rejected']);
-        return response()->json(['message' => 'Karya telah ditolak.', 'artwork' => $artwork]);
+
+        if ($artwork->user) {
+            $artwork->user->notify(new ArtworkRejectedNotification($artwork, $request->message));
+        }
+
+        return response()->json(['message' => 'Karya telah ditolak dan email notifikasi dikirim.', 'artwork' => $artwork]);
     }
 
     public function setPosition(Request $request, $id)
@@ -77,7 +90,7 @@ class AdminController extends Controller
     public function users(Request $request)
     {
         $query = User::with('programStudi:id_prodi,nama_prodi')
-                     ->withCount('artworks');
+            ->withCount('artworks');
 
         if ($request->role)   $query->where('role', $request->role);
         if ($request->search) $query->where('name', 'like', '%' . $request->search . '%');

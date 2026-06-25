@@ -33,6 +33,7 @@ class ResetPasswordNotification extends Notification
 
         // Gunakan custom Blade template (resources/views/emails/reset-password.blade.php)
         return (new MailMessage)
+            ->from(config('mail.from.address'), config('mail.from.name'))
             ->subject('🔐 Reset Password — Virtual Exhibition')
             ->view('emails.reset-password', [
                 'user'     => $notifiable,
