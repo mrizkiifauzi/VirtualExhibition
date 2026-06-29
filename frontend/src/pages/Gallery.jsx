@@ -166,8 +166,8 @@ export default function Gallery() {
               {meta?.total || artworks.length} karya ditemukan
             </p>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {artworks.map((a) => (
-                <ArtworkCard key={a.id} artwork={a} />
+              {artworks.map((a, index) => (
+                <ArtworkCard key={a.id} artwork={a} priority={index < 4} />
               ))}
             </div>
             {/* Pagination */}

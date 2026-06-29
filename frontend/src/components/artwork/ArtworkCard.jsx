@@ -5,7 +5,7 @@ import LikeButton from "../interactions/LikeButton";
 
 const API_URL = "http://localhost:8000"; // Sesuaikan dengan URL backend
 
-function ArtworkCard({ artwork }) {
+function ArtworkCard({ artwork, priority = false }) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
@@ -14,6 +14,9 @@ function ArtworkCard({ artwork }) {
     : artwork.tipe === "image"
       ? `${API_URL}/${artwork.file_path}`
       : null;
+
+  const loadingStrategy = priority ? "eager" : "lazy";
+  const fetchPriority = priority ? "high" : "auto";
 
   const typeIcon = { image: "🖼️", video: "🎬" };
 
@@ -30,8 +33,11 @@ function ArtworkCard({ artwork }) {
           <img
             src={thumb}
             alt={artwork.judul}
-            loading="lazy"
+            loading={loadingStrategy}
+            fetchPriority={fetchPriority}
             decoding="async"
+            width="400"
+            height="300"
             onLoad={() => setLoaded(true)}
             onError={() => setError(true)}
             className={`w-full h-full object-cover transition-all duration-500 

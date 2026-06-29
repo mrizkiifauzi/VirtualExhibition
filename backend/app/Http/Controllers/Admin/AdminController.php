@@ -64,15 +64,15 @@ class AdminController extends Controller
     public function setPosition(Request $request, $id)
     {
         $request->validate([
-            'posisi_3d' => 'required|array',
-            'posisi_3d.x' => 'required|numeric',
-            'posisi_3d.y' => 'required|numeric',
-            'posisi_3d.z' => 'required|numeric',
+            'posisi_3d' => 'nullable|array',
+            'posisi_3d.x' => 'required_with:posisi_3d|numeric',
+            'posisi_3d.y' => 'required_with:posisi_3d|numeric',
+            'posisi_3d.z' => 'required_with:posisi_3d|numeric',
             'posisi_3d.rotation' => 'nullable|numeric',
         ]);
 
         $artwork = Artwork::findOrFail($id);
-        $artwork->update(['posisi_3d' => $request->posisi_3d]);
+        $artwork->update(['posisi_3d' => $request->input('posisi_3d')]);
 
         return response()->json(['message' => 'Posisi 3D berhasil diset.', 'artwork' => $artwork]);
     }

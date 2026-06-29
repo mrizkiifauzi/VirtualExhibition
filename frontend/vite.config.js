@@ -15,6 +15,12 @@ export default defineConfig({
       "/storage": {
         target: "http://localhost:8000",
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/storage/, ""),
+      },
+      // Semua request /artworks → Laravel public/artworks
+      "/artworks": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
       },
     },
   },

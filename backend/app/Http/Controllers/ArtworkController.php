@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Artwork;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\ImageManager;
 
 class ArtworkController extends Controller
 {
@@ -134,11 +136,20 @@ class ArtworkController extends Controller
             mkdir($destination, 0755, true);
         }
 
-        // pindahkan file ke public/artworks
-        $file->move($destination, $filename);
-
-        // simpan path ke database
         $filePath = $directory . '/' . $filename;
+
+        if ($request->tipe === 'image') {
+            $imageManager = new ImageManager(GdDriver::class);
+            $optimizedImage = $imageManager
+                ->decodePath($file->getRealPath())
+                ->resize(1600, null);
+
+            $optimizedImage
+                ->encodeUsingFileExtension('jpg', 80)
+                ->save($destination . DIRECTORY_SEPARATOR . $filename);
+        } else {
+            $file->move($destination, $filename);
+        }
 
         // Upload thumbnail (optional)
         $thumbnailPath = null;
@@ -152,8 +163,14 @@ class ArtworkController extends Controller
                 mkdir($thumbDir, 0755, true);
             }
 
-            $thumb->move($thumbDir, $thumbName);
+            $thumbManager = new ImageManager(GdDriver::class);
+            $thumbImage = $thumbManager
+                ->decodePath($thumb->getRealPath())
+                ->resize(400, 300);
 
+            $thumbImage
+                ->encodeUsingFileExtension('jpg', 80)
+                ->save($thumbDir . DIRECTORY_SEPARATOR . $thumbName);
             $thumbnailPath = 'artworks/thumbnails/' . $thumbName;
         }
 
