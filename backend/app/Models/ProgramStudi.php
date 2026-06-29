@@ -8,7 +8,7 @@ class ProgramStudi extends Model
 {
     protected $table = 'program_studi';
     protected $primaryKey = 'id_prodi';
-    public $timestamps = false;
+    public $timestamps = true;
     protected $fillable = ['nama_prodi', 'jenjang'];
 
     public function users()

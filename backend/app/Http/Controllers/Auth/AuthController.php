@@ -17,7 +17,7 @@ class AuthController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role'     => 'nullable|in:pengunjung,mahasiswa',
-            'nim'      => 'nullable|string|max:20',
+            'nim'      => 'nullable|string|max:20|unique:users,nim',
             'id_prodi' => 'nullable|exists:program_studi,id_prodi',
         ]);
 

@@ -16,9 +16,9 @@ class UserController extends Controller
     {
         $request->validate([
             'name'       => 'sometimes|string|max:255',
-            'nim'        => 'nullable|string|max:20',
+            'nim'        => 'nullable|string|max:20|unique:users,nim,' . $request->user()->id_user . ',id_user',
             'id_prodi'   => 'nullable|exists:program_studi,id_prodi',
-            'foto_profil'=> 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'foto_profil' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $user = $request->user();

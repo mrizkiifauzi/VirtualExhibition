@@ -106,8 +106,8 @@ class ArtworkController extends Controller
             'judul'       => 'required|string|max:255',
             'deskripsi'   => 'nullable|string',
             'id_prodi'    => 'nullable|exists:program_studi,id_prodi',
-            'tipe'        => 'required|in:image,video,3d',
-            'file'        => 'required|file|mimes:jpg,jpeg,png,mp4,glb,gltf|max:102400',
+            'tipe'        => 'required|in:image,video',
+            'file'        => 'required|file|mimes:jpg,jpeg,png,mp4|max:102400',
             'thumbnail'   => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
@@ -121,7 +121,6 @@ class ArtworkController extends Controller
         $directory = match ($request->tipe) {
             'image' => 'artworks/img',
             'video' => 'artworks/video',
-            '3d' => 'artworks/3d',
             default => 'artworks/files',
         };
 

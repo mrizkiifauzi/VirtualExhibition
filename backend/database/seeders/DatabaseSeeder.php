@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             ['nama_prodi' => 'Rekayasa Keamanan Siber',   'jenjang' => 'D4'],
             ['nama_prodi' => 'Teknik Komputer',           'jenjang' => 'S2'],
             ['nama_prodi' => 'Teknologi Geomatika',       'jenjang' => 'D3'],
-            ['nama_prodi' => 'Rekayasa Perangkat Lunak',  'jenjang' => 'D4'],
+            ['nama_prodi' => 'Teknologi Rekayasa Perangkat Lunak',  'jenjang' => 'D4'],
             ['nama_prodi' => 'Teknologi Rekayasa Multimedia',  'jenjang' => 'D4'],
             ['nama_prodi' => 'Teknologi Permainan',  'jenjang' => 'D4'],
         ];

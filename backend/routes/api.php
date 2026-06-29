@@ -56,5 +56,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users',                 [AdminController::class, 'users']);
         Route::put('/users/{id}/role',       [AdminController::class, 'updateRole']);
         Route::delete('/users/{id}',         [AdminController::class, 'deleteUser']);
+        Route::get('/program-studi',         [ProgramStudiController::class, 'adminIndex']);
+        Route::post('/program-studi',        [ProgramStudiController::class, 'store']);
+        Route::put('/program-studi/{id}',    [ProgramStudiController::class, 'update']);
+        Route::delete('/program-studi/{id}', [ProgramStudiController::class, 'destroy']);
     });
 });

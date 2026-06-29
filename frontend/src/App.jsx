@@ -22,6 +22,7 @@ import AdminPanel from "./pages/admin/AdminPanel";
 import ManageArtworks from "./pages/admin/ManageArtworks";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageRooms from "./pages/admin/ManageRooms";
+import ManagePrograms from "./pages/admin/ManagePrograms";
 
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user } = useAuthStore();
@@ -99,6 +100,14 @@ export default function App() {
         element={
           <ProtectedRoute adminOnly>
             <ManageRooms />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/programs"
+        element={
+          <ProtectedRoute adminOnly>
+            <ManagePrograms />
           </ProtectedRoute>
         }
       />
