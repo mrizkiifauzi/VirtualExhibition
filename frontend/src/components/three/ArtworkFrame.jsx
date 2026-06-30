@@ -1,6 +1,28 @@
-import { useRef, useState, useEffect, useMemo, Suspense, memo } from "react";
+import { Component, useRef, useState, useEffect, useMemo, Suspense, memo } from "react";
 import { useTexture, useGLTF, Text, Billboard, Html } from "@react-three/drei";
 import * as THREE from "three";
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    console.error("ArtworkFrame error:", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || null;
+    }
+    return this.props.children;
+  }
+}
 
 // ── Normalize URL aset supaya bisa dimuat dari frontend dev server
 //  - public/artworks/* → /artworks/*
@@ -223,9 +245,11 @@ function Frame({ artwork, position, rotation, onClick }) {
 
     if (glbUrl) {
       return (
-        <Suspense fallback={<PlaceholderPlane label="Memuat 3D..." />}>
-          <GLBModel url={glbUrl} />
-        </Suspense>
+        <ErrorBoundary fallback={<PlaceholderPlane label="Gagal memuat 3D" />}>
+          <Suspense fallback={<PlaceholderPlane label="Memuat 3D..." />}>
+            <GLBModel url={glbUrl} />
+          </Suspense>
+        </ErrorBoundary>
       );
     }
 

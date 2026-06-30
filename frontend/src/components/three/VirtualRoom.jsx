@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Component, Suspense, useEffect, useMemo } from "react";
+import { Component, Suspense, useEffect, useMemo, useState } from "react";
 import { Environment, Html, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import PlayerControls from "./PlayerControls";
@@ -24,6 +24,9 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
       return (
         <mesh>
           <planeGeometry args={[10, 5]} />
@@ -45,8 +48,24 @@ function CanvasFallback() {
   );
 }
 
-function RoomScene() {
+function RoomScene({ setColliders }) {
   const { scene } = useGLTF(roomModelUrl);
+
+  useEffect(() => {
+    const colliderList = [];
+
+    scene.traverse((child) => {
+      if (child.name.startsWith("Collider_")) {
+        child.visible = false;
+        colliderList.push(child);
+      }
+    });
+
+    console.log("Jumlah collider:", colliderList.length);
+
+    setColliders(colliderList);
+
+  }, [scene, setColliders]);
 
   return (
     <primitive
@@ -59,6 +78,7 @@ function RoomScene() {
 }
 
 export default function VirtualRoom({ artworks, onArtworkClick }) {
+const [colliders, setColliders] = useState([]);
   const visibleArtworks = useMemo(
     () =>
       (artworks || []).filter(
@@ -132,18 +152,28 @@ export default function VirtualRoom({ artworks, onArtworkClick }) {
           <Environment preset="city" />
 
           <ErrorBoundary>
-            <RoomScene />
+            <RoomScene setColliders={setColliders} />
           </ErrorBoundary>
-          <PlayerControls />
+<PlayerControls colliders={colliders} />
 
           {artworkPositions.map(({ artwork, position, rotation }) => (
-            <ArtworkFrame
+            <ErrorBoundary
               key={artwork.id}
-              artwork={artwork}
-              position={position}
-              rotation={rotation}
-              onClick={() => onArtworkClick(artwork)}
-            />
+              fallback={
+                <Html position={position} center>
+                  <div className="bg-black/70 text-white rounded-xl border border-white/10 px-3 py-2 text-xs">
+                    Karya gagal dimuat
+                  </div>
+                </Html>
+              }
+            >
+              <ArtworkFrame
+                artwork={artwork}
+                position={position}
+                rotation={rotation}
+                onClick={() => onArtworkClick(artwork)}
+              />
+            </ErrorBoundary>
           ))}
         </Suspense>
       </Canvas>

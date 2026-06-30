@@ -2,12 +2,13 @@ import { useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export default function PlayerControls() {
+export default function PlayerControls({ colliders }) {
   const { camera, gl } = useThree()
   const keys   = useRef({})
   const yaw    = useRef(0)
   const pitch  = useRef(0)
   const locked = useRef(false)
+  const playerSize = new THREE.Vector3(0.6, 1.6, 0.6)
 
   useEffect(() => {
     const canvas = gl.domElement
@@ -62,14 +63,37 @@ export default function PlayerControls() {
     if (keys.current['KeyA'] || keys.current['ArrowLeft'])  dir.sub(right)
     if (keys.current['KeyD'] || keys.current['ArrowRight']) dir.add(right)
 
-    if (dir.lengthSq() > 0) {
-      dir.normalize()
-      camera.position.addScaledVector(dir, speed * delta)
+   if (dir.lengthSq() > 0) {
+
+  dir.normalize()
+
+  const nextPos = camera.position.clone()
+  nextPos.addScaledVector(dir, speed * delta)
+
+  const playerBox = new THREE.Box3().setFromCenterAndSize(
+    nextPos,
+    playerSize
+  )
+
+  let blocked = false
+
+  for (const collider of colliders) {
+
+    const colliderBox = new THREE.Box3().setFromObject(collider)
+
+    if (playerBox.intersectsBox(colliderBox)) {
+      blocked = true
+      break
     }
+  }
+
+  if (!blocked) {
+    camera.position.copy(nextPos)
+  }
+
+}
 
     // Clamp to room bounds
-    camera.position.x = Math.max(-23, Math.min(23, camera.position.x))
-    camera.position.z = Math.max(-23, Math.min(23, camera.position.z))
     camera.position.y = 1.6 // Fixed eye height
   })
 
