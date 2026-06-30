@@ -7,10 +7,14 @@ export default function LoadingScreen() {
           <span className="text-2xl">🖼️</span>
         </div>
       </div>
-      <h2 className="text-2xl font-bold text-white mb-2">Virtual Exhibition</h2>
-      <p className="text-white/50 text-sm animate-pulse">Memuat ruang galeri 3D...</p>
-      <div className="mt-8 flex gap-2">
-        {[0,1,2].map(i => (
+      <h2 className="text-2xl font-bold text-white mb-2 text-center">
+        Virtual Exhibition
+      </h2>
+      {/* <p className="text-white/50 text-sm animate-pulse text-center">
+        Memuat ruang galeri 3D...
+      </p> */}
+      <div className="mt-5 flex gap-2">
+        {[0, 1, 2].map((i) => (
           <div
             key={i}
             className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"
@@ -19,5 +23,5 @@ export default function LoadingScreen() {
         ))}
       </div>
     </div>
-  )
+  );
 }

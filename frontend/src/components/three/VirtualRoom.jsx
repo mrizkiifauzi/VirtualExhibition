@@ -4,6 +4,7 @@ import { Environment, Html, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import PlayerControls from "./PlayerControls";
 import ArtworkFrame, { preloadArtwork } from "./ArtworkFrame";
+import LoadingScreen from "./LoadingScreen";
 
 const roomModelUrl = new URL("../../assets/3d/gallery.glb", import.meta.url)
   .href;
@@ -41,9 +42,7 @@ class ErrorBoundary extends Component {
 function CanvasFallback() {
   return (
     <Html center>
-      <div className="bg-black/80 text-white rounded-xl border border-white/10 px-4 py-3 text-sm font-medium">
-        Memuat ruang galeri...
-      </div>
+      <LoadingScreen />
     </Html>
   );
 }
@@ -64,7 +63,6 @@ function RoomScene({ setColliders }) {
     console.log("Jumlah collider:", colliderList.length);
 
     setColliders(colliderList);
-
   }, [scene, setColliders]);
 
   return (
@@ -78,7 +76,7 @@ function RoomScene({ setColliders }) {
 }
 
 export default function VirtualRoom({ artworks, onArtworkClick }) {
-const [colliders, setColliders] = useState([]);
+  const [colliders, setColliders] = useState([]);
   const visibleArtworks = useMemo(
     () =>
       (artworks || []).filter(
@@ -154,7 +152,7 @@ const [colliders, setColliders] = useState([]);
           <ErrorBoundary>
             <RoomScene setColliders={setColliders} />
           </ErrorBoundary>
-<PlayerControls colliders={colliders} />
+          <PlayerControls colliders={colliders} />
 
           {artworkPositions.map(({ artwork, position, rotation }) => (
             <ErrorBoundary

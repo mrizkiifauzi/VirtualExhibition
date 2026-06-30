@@ -1,30 +1,31 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 const useAuthStore = create((set) => ({
-  user:  JSON.parse(localStorage.getItem('user') || 'null'),
-  token: localStorage.getItem('token') || null,
+  user: JSON.parse(localStorage.getItem("user") || "null"),
+  token: localStorage.getItem("token") || null,
 
   setAuth: (user, token) => {
-    localStorage.setItem('user',  JSON.stringify(user))
-    localStorage.setItem('token', token)
-    set({ user, token })
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("token", token);
+    set({ user, token });
   },
 
   updateUser: (user) => {
-    localStorage.setItem('user', JSON.stringify(user))
-    set({ user })
+    localStorage.setItem("user", JSON.stringify(user));
+    set({ user });
   },
 
   logout: () => {
-    localStorage.removeItem('user')
-    localStorage.removeItem('token')
-    set({ user: null, token: null })
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    set({ user: null, token: null });
   },
 
-  isLoggedIn:   () => !!localStorage.getItem('token'),
-  isAdmin:      () => JSON.parse(localStorage.getItem('user') || 'null')?.role === 'admin',
-  isMahasiswa:  () => JSON.parse(localStorage.getItem('user') || 'null')?.role === 'mahasiswa',
-}))
+  isLoggedIn: () => !!localStorage.getItem("token"),
+  isAdmin: () =>
+    JSON.parse(localStorage.getItem("user") || "null")?.role === "admin",
+  isMahasiswa: () =>
+    JSON.parse(localStorage.getItem("user") || "null")?.role === "mahasiswa",
+}));
 
-export default useAuthStore
-s
+export default useAuthStore;
