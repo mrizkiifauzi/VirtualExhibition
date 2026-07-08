@@ -122,10 +122,13 @@ export default function ArtworkDetail() {
                       Nim: {artwork.user.nim}
                     </p>
                   )}
-                  {artwork.program_studi && (
+                  {(artwork.user?.program_studi || artwork.user?.programStudi) && (
                     <div className="mb-3">
                       <p className="text-xs text-white/40">
-                        Prodi: {artwork.program_studi.nama_prodi}
+                        Prodi: {
+                          (artwork.user?.program_studi || artwork.user?.programStudi)
+                            .nama_prodi
+                        }
                       </p>
                     </div>
                   )}
