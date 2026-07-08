@@ -5,6 +5,7 @@ import * as THREE from "three";
 import PlayerControls from "./PlayerControls";
 import ArtworkFrame, { preloadArtwork } from "./ArtworkFrame";
 import LoadingScreen from "./LoadingScreen";
+import FrameManager from "./FrameManager";
 
 const roomModelUrl = new URL("../../assets/3d/gallery.glb", import.meta.url)
   .href;
@@ -47,7 +48,10 @@ function CanvasFallback() {
   );
 }
 
-function RoomScene({ setColliders }) {
+function RoomScene({
+    setColliders,
+    artworks
+}) {
   const { scene } = useGLTF(roomModelUrl);
 
   useEffect(() => {
@@ -66,13 +70,21 @@ function RoomScene({ setColliders }) {
   }, [scene, setColliders]);
 
   return (
-    <primitive
-      object={scene}
-      scale={[1, 1, 1]}
-      position={[0, 0, 0]}
-      rotation={[0, 0, 0]}
-    />
-  );
+    <>
+        <primitive
+            object={scene}
+            scale={[1,1,1]}
+            position={[0,0,0]}
+            rotation={[0,0,0]}
+        />
+
+        <FrameManager
+            scene={scene}
+            artworks={artworks}
+            
+        />
+    </>
+);
 }
 
 export default function VirtualRoom({ artworks, onArtworkClick }) {
@@ -150,7 +162,9 @@ export default function VirtualRoom({ artworks, onArtworkClick }) {
           <Environment preset="city" />
 
           <ErrorBoundary>
-            <RoomScene setColliders={setColliders} />
+            <RoomScene
+          setColliders={setColliders}
+          artworks={visibleArtworks}/>
           </ErrorBoundary>
           <PlayerControls colliders={colliders} />
 

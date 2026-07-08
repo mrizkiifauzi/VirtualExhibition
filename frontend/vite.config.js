@@ -17,8 +17,21 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/storage/, ""),
       },
-      // Semua request /artworks → Laravel public/artworks
-      "/artworks": {
+      // Semua request /artworks/<tipe>/* → Laravel public/artworks
+      // Jangan proxy route SPA /artworks/:id karena ini akan ditangani oleh React Router.
+      "/artworks/img": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/artworks/video": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/artworks/files": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+      "/artworks/thumbnails": {
         target: "http://localhost:8000",
         changeOrigin: true,
       },

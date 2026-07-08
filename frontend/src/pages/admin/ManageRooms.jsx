@@ -5,29 +5,13 @@ import api from "../../api/axios";
 import toast from "react-hot-toast";
 
 const API_URL = "http://localhost:8000";
-
-// Preset positions for the virtual room
-const PRESETS = [
-  { label: "Dinding Depan Kiri", x: -10, y: 2, z: -24, rotation: 0 },
-  { label: "Dinding Depan Tengah", x: 0, y: 2, z: -24, rotation: 0 },
-  { label: "Dinding Depan Kanan", x: 10, y: 2, z: -24, rotation: 0 },
-  { label: "Dinding Kiri Depan", x: -24, y: 2, z: -10, rotation: 1.57 },
-  { label: "Dinding Kiri Tengah", x: -24, y: 2, z: 0, rotation: 1.57 },
-  { label: "Dinding Kiri Belakang", x: -24, y: 2, z: 10, rotation: 1.57 },
-  { label: "Dinding Kanan Depan", x: 24, y: 2, z: -10, rotation: -1.57 },
-  { label: "Dinding Kanan Tengah", x: 24, y: 2, z: 0, rotation: -1.57 },
-  { label: "Dinding Kanan Belakang", x: 24, y: 2, z: 10, rotation: -1.57 },
-  { label: "Dinding Belakang Kiri", x: -10, y: 2, z: 24, rotation: 3.14 },
-  { label: "Dinding Belakang Tengah", x: 0, y: 2, z: 24, rotation: 3.14 },
-  { label: "Dinding Belakang Kanan", x: 10, y: 2, z: 24, rotation: 3.14 },
-];
+const FRAME_OPTIONS = Array.from({ length: 27 }, (_, i) => i + 1);
 
 export default function ManageRooms() {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(null);
   const [editId, setEditId] = useState(null);
-  const [posForm, setPosForm] = useState({ x: 0, y: 2, z: 0, rotation: 0 });
 
   useEffect(() => {
     api
@@ -35,39 +19,29 @@ export default function ManageRooms() {
       .then(({ data }) => setArtworks(data.data || []))
       .finally(() => setLoading(false));
   }, []);
-
-  const openEdit = (a) => {
-    setEditId(a.id);
-    setPosForm(a.posisi_3d || { x: 0, y: 2, z: 0, rotation: 0 });
-  };
-
-  const applyPreset = (preset) => {
-    setPosForm({
-      x: preset.x,
-      y: preset.y,
-      z: preset.z,
-      rotation: preset.rotation,
-    });
-  };
-
-  const savePosition = async (id) => {
+  // Perubahan menghapus posisi karya padahal telah diterapkan di asset 3D
+  // Mengapplykan karya ke frame 3D
+  const saveFrame = async (id, frame) => {
     setSaving(id);
     try {
-      await api.put(`/admin/artworks/${id}/position`, { posisi_3d: posForm });
+      await api.put(`/admin/artworks/${id}/position`, {
+        posisi_3d: { frame },
+      });
       setArtworks((prev) =>
         prev.map((a) =>
-          a.id === id ? { ...a, posisi_3d: { ...posForm } } : a,
+          a.id === id ? { ...a, posisi_3d: { frame } } : a,
         ),
       );
-      toast.success("Posisi berhasil disimpan!");
+      toast.success(`Karya berhasil ditempatkan ke Frame ${frame}.`);
       setEditId(null);
     } catch {
-      toast.error("Gagal menyimpan posisi");
+      toast.error("Gagal menempatkan karya ke frame 3D.");
     } finally {
       setSaving(null);
     }
   };
 
+ 
   return (
     <div className="min-h-screen bg-gray-950 pt-16">
       <Navbar />
@@ -79,18 +53,13 @@ export default function ManageRooms() {
           <h1 className="text-2xl font-bold text-white">Atur Ruang 3D</h1>
         </div>
 
-        {/* Info */}
         <div className="card p-4 mb-6 flex gap-3 bg-blue-900/20 border-blue-500/30">
           <span className="text-xl shrink-0">ℹ️</span>
           <div className="text-sm text-blue-300">
-            <p className="font-medium mb-1">
-              Cara mengatur posisi karya di ruang 3D:
-            </p>
+            <p className="font-medium mb-1">Pilih nomor frame untuk setiap karya:</p>
             <p className="text-blue-300/70">
-              Hanya karya yang sudah <strong>diverifikasi</strong> yang bisa
-              diatur posisinya. Gunakan preset dinding atau atur koordinat
-              manual. Koordinat: X (kiri-kanan), Y (tinggi, default=2), Z
-              (depan-belakang). Ruang berukuran -25 hingga 25.
+              Setiap angka akan menempatkan karya ke objek <strong>Frame_#</strong> di ruangan 3D.
+              Pilih 1–27 sesuai slot yang tersedia.
             </p>
           </div>
         </div>
@@ -116,172 +85,84 @@ export default function ManageRooms() {
           <div className="space-y-4">
             {artworks.map((a) => (
               <div key={a.id} className="card overflow-hidden">
-                {/* Artwork row */}
-                <div className="p-4 flex items-center gap-4">
-                  {/* Thumbnail */}
-                  <div className="w-14 h-14 bg-gray-900 rounded-xl overflow-hidden shrink-0">
-                    {a.thumbnail || a.tipe === "image" ? (
-                      <img
-                        src={`${API_URL}/${a.thumbnail || a.file_path}`}
-                        alt={a.judul}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-2xl">
-                        {a.tipe === "video" ? "🎬" : "🎲"}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white truncate">{a.judul}</p>
-                    <p className="text-xs text-white/40">
-                      {a.user?.name} · {a.program_studi?.nama_prodi}
-                    </p>
-                    {a.posisi_3d ? (
-                      <p className="text-xs text-green-400 mt-0.5">
-                        📍 X:{a.posisi_3d.x} Y:{a.posisi_3d.y} Z:{a.posisi_3d.z}{" "}
-                        R:{a.posisi_3d.rotation}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-yellow-400/70 mt-0.5">
-                        ⚠️ Belum ada posisi — akan diauto oleh sistem
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Toggle edit */}
-                  <button
-                    onClick={() =>
-                      editId === a.id ? setEditId(null) : openEdit(a)
-                    }
-                    className={`text-sm px-4 py-2 rounded-lg transition-all ${
-                      editId === a.id
-                        ? "bg-white/20 text-white"
-                        : "btn-secondary"
-                    }`}
-                  >
-                    {editId === a.id
-                      ? "Tutup"
-                      : a.posisi_3d
-                        ? "📐 Atur Posisi"
-                        : "➕ Tambah ke 3D"}
-                  </button>
-                  {a.posisi_3d && (
-                    <button
-                      onClick={() => {
-                        if (!confirm("Hapus karya ini dari ruang 3D?")) return;
-                        api
-                          .put(`/admin/artworks/${a.id}/position`, {
-                            posisi_3d: null,
-                          })
-                          .then(() => {
-                            setArtworks((prev) =>
-                              prev.map((item) =>
-                                item.id === a.id
-                                  ? { ...item, posisi_3d: null }
-                                  : item,
-                              ),
-                            );
-                            toast.success(
-                              "Karya berhasil dihapus dari ruang 3D.",
-                            );
-                          })
-                          .catch(() => {
-                            toast.error("Gagal menghapus karya dari ruang 3D.");
-                          });
-                      }}
-                      className="btn-danger text-sm py-2 px-4 rounded-lg"
-                    >
-                      🗑️ Hapus dari 3D
-                    </button>
-                  )}
-                </div>
-
-                {/* Position editor */}
-                {editId === a.id && (
-                  <div className="border-t border-white/10 p-5 bg-white/[0.02]">
-                    {/* Presets */}
-                    <p className="text-xs font-medium text-white/50 mb-3">
-                      Preset Dinding:
-                    </p>
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      {PRESETS.map((p) => (
-                        <button
-                          key={p.label}
-                          onClick={() => applyPreset(p)}
-                          className="text-xs bg-white/10 hover:bg-primary-900/50 hover:text-primary-300 text-white/60 px-3 py-1.5 rounded-lg transition-all border border-transparent hover:border-primary-500/30"
-                        >
-                          {p.label}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Manual input */}
-                    <p className="text-xs font-medium text-white/50 mb-3">
-                      Koordinat Manual:
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                      {[
-                        {
-                          key: "x",
-                          label: "X (kiri/kanan)",
-                          min: -25,
-                          max: 25,
-                        },
-                        { key: "y", label: "Y (tinggi)", min: 0, max: 5 },
-                        {
-                          key: "z",
-                          label: "Z (depan/belakang)",
-                          min: -25,
-                          max: 25,
-                        },
-                        {
-                          key: "rotation",
-                          label: "Rotasi (radian)",
-                          min: -3.14,
-                          max: 3.14,
-                          step: 0.01,
-                        },
-                      ].map(({ key, label, min, max, step = 1 }) => (
-                        <div key={key}>
-                          <label className="label">{label}</label>
-                          <input
-                            type="number"
-                            value={posForm[key]}
-                            min={min}
-                            max={max}
-                            step={step}
-                            onChange={(e) =>
-                              setPosForm({
-                                ...posForm,
-                                [key]: parseFloat(e.target.value) || 0,
-                              })
-                            }
-                            className="input text-sm"
-                          />
+                <div className="p-4 flex flex-col gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-gray-900 rounded-xl overflow-hidden shrink-0">
+                      {a.thumbnail || a.tipe === "image" ? (
+                        <img
+                          src={`${API_URL}/${a.thumbnail || a.file_path}`}
+                          alt={a.judul}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl">
+                          {a.tipe === "video" ? "🎬" : "🎲"}
                         </div>
-                      ))}
+                      )}
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-white truncate">{a.judul}</p>
+                      <p className="text-xs text-white/40">
+                        {a.user?.name} · {a.program_studi?.nama_prodi}
+                      </p>
+                      {a.posisi_3d?.frame ? (
+                        <p className="text-xs text-green-400 mt-0.5">
+                          📍 Frame {a.posisi_3d.frame}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-yellow-400/70 mt-0.5">
+                          ⚠️ Belum dipilih frame 3D
+                        </p>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => setEditId(editId === a.id ? null : a.id)}
+                      className={`text-sm px-4 py-2 rounded-lg transition-all ${
+                        editId === a.id
+                          ? "bg-white/20 text-white"
+                          : "btn-secondary"
+                      }`}
+                    >
+                      {editId === a.id
+                        ? "Tutup"
+                        : a.posisi_3d?.frame
+                          ? "Ubah Frame"
+                          : "➕ Pilih Frame"}
+                    </button>
+                  </div>
+
+                  {editId === a.id && (
+                    <div className="border-t border-white/10 p-5 bg-white/[0.02]">
+                      <p className="text-xs font-medium text-white/50 mb-3">
+                        Pilih slot frame 1–27:
+                      </p>
+                      <div className="grid grid-cols-4 md:grid-cols-7 gap-2 mb-4">
+                        {FRAME_OPTIONS.map((frame) => (
+                          <button
+                            key={frame}
+                            disabled={saving === a.id}
+                            onClick={() => saveFrame(a.id, frame)}
+                            className={`text-sm rounded-lg py-2 transition-all border ${
+                              a.posisi_3d?.frame === frame
+                                ? "bg-primary-600 border-primary-400 text-white"
+                                : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
+                            } ${saving === a.id ? "cursor-wait opacity-60" : ""}`}
+                          >
+                            {frame}
+                          </button>
+                        ))}
+                      </div>
                       <button
                         onClick={() => setEditId(null)}
-                        className="btn-secondary text-sm flex-1 py-2"
+                        className="btn-secondary text-sm py-2 w-full"
                       >
                         Batal
                       </button>
-                      <button
-                        onClick={() => savePosition(a.id)}
-                        disabled={saving === a.id}
-                        className="btn-primary text-sm flex-1 py-2"
-                      >
-                        {saving === a.id ? "Menyimpan..." : "💾 Simpan Posisi"}
-                      </button>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ))}
           </div>
