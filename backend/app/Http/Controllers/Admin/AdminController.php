@@ -62,36 +62,44 @@ class AdminController extends Controller
     }
 
     public function setPosition(Request $request, $id)
-{
-    $request->validate([
-        'posisi_3d' => 'required|array',
-        'posisi_3d.frame' => 'required|integer|min:1|max:27',
-    ]);
+    {
+        if ($request->input('posisi_3d') === null) {
 
-    $artwork = Artwork::findOrFail($id);
-$frame = $request->input('posisi_3d.frame');
+            $artwork = Artwork::findOrFail($id);
 
-$used = Artwork::where('id', '!=', $id)
-    ->where('status', 'verified')
-    ->where('posisi_3d->frame', $frame)
-    ->exists();
+            $artwork->update([
+                'posisi_3d' => null
+            ]);
 
-if ($used) {
-    return response()->json([
-        'message' => "Frame {$frame} sudah digunakan artwork lain."
-    ], 422);
-}
-    $artwork->update([
-        'posisi_3d' => [
-            'frame' => $request->input('posisi_3d.frame'),
-        ]
-    ]);
+            return response()->json([
+                'message' => 'Frame berhasil dilepas.'
+            ]);
+        }
 
-    return response()->json([
-        'message' => 'Frame berhasil disimpan.',
-        'artwork' => $artwork
-    ]);
-}
+        $artwork = Artwork::findOrFail($id);
+        $frame = $request->input('posisi_3d.frame');
+
+        $used = Artwork::where('id', '!=', $id)
+            ->where('status', 'verified')
+            ->where('posisi_3d->frame', $frame)
+            ->exists();
+
+        if ($used) {
+            return response()->json([
+                'message' => "Frame {$frame} sudah digunakan artwork lain."
+            ], 422);
+        }
+        $artwork->update([
+            'posisi_3d' => [
+                'frame' => $request->input('posisi_3d.frame'),
+            ]
+        ]);
+
+        return response()->json([
+            'message' => 'Frame berhasil disimpan.',
+            'artwork' => $artwork
+        ]);
+    }
 
     public function deleteArtwork($id)
     {
