@@ -3,65 +3,134 @@ import * as THREE from "three";
 
 const API_URL = "http://localhost:8000";
 
+function buildMediaUrl(path) {
+  if (!path) return null;
+
+  const normalized = String(path).trim();
+  if (normalized.startsWith("http")) return normalized;
+
+  return `${API_URL}/${normalized.replace(/^\/+/, "")}`;
+}
+
+function isVideoArtwork(artwork) {
+  const type = `${artwork.tipe || artwork.type || ""}`.toLowerCase();
+  const filePath = `${artwork.file_path || artwork.thumbnail || ""}`.toLowerCase();
+
+  return type === "video" || /\.(mp4|webm|ogg|mov)$/i.test(filePath);
+}
+
+function padFrame(frame) {
+  const frameNumber = Number(frame);
+  if (!Number.isFinite(frameNumber)) return String(frame);
+  return String(frameNumber).padStart(2, "0");
+}
+
+function getFrameObjectName(artwork, frame) {
+  const normalizedFrame = padFrame(frame);
+  const isVideo = isVideoArtwork(artwork);
+
+  if (isVideo) {
+    return [
+      `FrameVideo_${normalizedFrame}`,
+      `FrameVideo_${frame}`,
+      `Frame_${normalizedFrame}`,
+    ];
+  }
+
+  return [`Frame_${frame}`, `Frame_${normalizedFrame}`];
+}
+
+function applyTextureToMaterial(material, texture) {
+  if (!material) return;
+
+  if (Array.isArray(material)) {
+    material.forEach((entry) => {
+      if (entry) {
+        entry.map = texture;
+        entry.needsUpdate = true;
+      }
+    });
+    return;
+  }
+
+  material.map = texture;
+  material.needsUpdate = true;
+}
+
 export default function FrameManager({ scene, artworks }) {
+  useEffect(() => {
+    if (!scene) return;
 
-    useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin("anonymous");
+    const createdVideos = [];
 
-        if (!scene) return;
+    artworks.forEach((artwork) => {
+      if (!artwork.posisi_3d?.frame) return;
 
-        const loader = new THREE.TextureLoader();
-        loader.setCrossOrigin("anonymous");
+      const frameNames = getFrameObjectName(artwork, artwork.posisi_3d.frame);
+      const frame = frameNames
+        .map((name) => scene.getObjectByName(name))
+        .find(Boolean);
 
-        artworks.forEach((artwork) => {
+      if (!frame) {
+        console.log("Tidak ketemu frame:", artwork.posisi_3d.frame, frameNames);
+        return;
+      }
 
-            if (!artwork.posisi_3d?.frame) return;
+      const mediaUrl = buildMediaUrl(artwork.thumbnail || artwork.file_path);
+      if (!mediaUrl) return;
 
-            const frame = scene.getObjectByName(
-                `Frame_${artwork.posisi_3d.frame}`
-            );
+      if (isVideoArtwork(artwork)) {
+        const video = document.createElement("video");
+        video.src = mediaUrl;
+        video.crossOrigin = "anonymous";
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        video.preload = "auto";
 
-            if (!frame) {
-                console.log("Tidak ketemu:", artwork.posisi_3d.frame);
-                return;
-            }
-
-            console.log("Ketemu:", frame.name);
-
-            console.log("Artwork:", artwork);
-
-const imageUrl = `${API_URL}/${artwork.thumbnail || artwork.file_path}`;
-
-console.log("Image URL:", imageUrl);
-
-console.log("Load texture:", imageUrl);
-
-const texture = loader.load(
-    imageUrl,
-    (texture) => {
-
-        console.log("Texture berhasil:", artwork.judul);
-
-        texture.flipY = false;
-        texture.colorSpace = THREE.SRGBColorSpace;
-
-        frame.material.map = texture;
-        frame.material.needsUpdate = true;
-
-    },
-    undefined,
-    (err) => {
-        console.error("Texture gagal:", err);
-    }
-);
-
-            texture.flipY = false;
-
-            frame.material.map = texture;
-            frame.material.needsUpdate = true;
-
+        video.addEventListener("loadeddata", () => {
+          video.play().catch(() => {});
         });
 
-    }, [scene, artworks]);
+        const texture = new THREE.VideoTexture(video);
+        texture.flipY = false;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.needsUpdate = true;
 
-    return null;
+        applyTextureToMaterial(frame.material, texture);
+        createdVideos.push(video);
+        return;
+      }
+
+      const texture = loader.load(
+        mediaUrl,
+        (loadedTexture) => {
+          loadedTexture.flipY = false;
+          loadedTexture.colorSpace = THREE.SRGBColorSpace;
+          applyTextureToMaterial(frame.material, loadedTexture);
+        },
+        undefined,
+        (err) => {
+          console.error("Texture gagal:", err);
+        },
+      );
+
+      texture.flipY = false;
+      applyTextureToMaterial(frame.material, texture);
+    });
+
+    return () => {
+      createdVideos.forEach((video) => {
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
+      });
+      createdVideos.length = 0;
+    };
+  }, [scene, artworks]);
+
+  return null;
 }

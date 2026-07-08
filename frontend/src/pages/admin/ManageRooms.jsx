@@ -5,7 +5,8 @@ import api from "../../api/axios";
 import toast from "react-hot-toast";
 
 const API_URL = "http://localhost:8000";
-const FRAME_OPTIONS = Array.from({ length: 27 }, (_, i) => i + 1);
+const IMAGE_FRAME_OPTIONS = Array.from({ length: 27 }, (_, i) => i + 1);
+const VIDEO_FRAME_OPTIONS = Array.from({ length: 23 }, (_, i) => i + 1);
 
 export default function ManageRooms() {
   const [artworks, setArtworks] = useState([]);
@@ -21,7 +22,7 @@ export default function ManageRooms() {
   }, []);
   // Perubahan menghapus posisi karya padahal telah diterapkan di asset 3D
   // Mengapplykan karya ke frame 3D
-  const saveFrame = async (id, frame) => {
+  const saveFrame = async (id, frame, artworkType) => {
     setSaving(id);
     try {
       await api.put(`/admin/artworks/${id}/position`, {
@@ -32,7 +33,10 @@ export default function ManageRooms() {
           a.id === id ? { ...a, posisi_3d: { frame } } : a,
         ),
       );
-      toast.success(`Karya berhasil ditempatkan ke Frame ${frame}.`);
+      const targetName = artworkType === "video"
+        ? `FrameVideo_${String(frame).padStart(2, "0")}`
+        : `Frame_${frame}`;
+      toast.success(`Karya berhasil ditempatkan ke ${targetName}.`);
       setEditId(null);
     } catch {
       toast.error("Gagal menempatkan karya ke frame 3D.");
@@ -82,8 +86,7 @@ export default function ManageRooms() {
           <div className="text-sm text-blue-300">
             <p className="font-medium mb-1">Pilih nomor frame untuk setiap karya:</p>
             <p className="text-blue-300/70">
-              Setiap angka akan menempatkan karya ke objek <strong>Frame_#</strong> di ruangan 3D.
-              Pilih 1–27 sesuai slot yang tersedia.
+              Karya gambar memakai objek <strong>Frame_#</strong> (1–27), sementara karya video memakai <strong>FrameVideo_01</strong> sampai <strong>FrameVideo_23</strong>.
             </p>
           </div>
         </div>
@@ -132,7 +135,9 @@ export default function ManageRooms() {
                       </p>
                       {a.posisi_3d?.frame ? (
                         <p className="text-xs text-green-400 mt-0.5">
-                          📍 Frame {a.posisi_3d.frame}
+                          📍 {a.tipe === "video"
+                            ? `FrameVideo_${String(a.posisi_3d.frame).padStart(2, "0")}`
+                            : `Frame_${a.posisi_3d.frame}`}
                         </p>
                       ) : (
                         <p className="text-xs text-yellow-400/70 mt-0.5">
@@ -172,14 +177,14 @@ export default function ManageRooms() {
                     <div className="border-t border-white/10 p-5 bg-white/[0.02]">
                       
                       <p className="text-xs font-medium text-white/50 mb-3">
-                        Pilih slot frame 1–27:
+                        Pilih slot frame {a.tipe === "video" ? "1–23" : "1–27"}:
                       </p>
                       <div className="grid grid-cols-4 md:grid-cols-7 gap-2 mb-4">
-                        {FRAME_OPTIONS.map((frame) => (
+                        {(a.tipe === "video" ? VIDEO_FRAME_OPTIONS : IMAGE_FRAME_OPTIONS).map((frame) => (
                           <button
                             key={frame}
                             disabled={saving === a.id}
-                            onClick={() => saveFrame(a.id, frame)}
+                            onClick={() => saveFrame(a.id, frame, a.tipe)}
                             className={`text-sm rounded-lg py-2 transition-all border ${
                               a.posisi_3d?.frame === frame
                                 ? "bg-primary-600 border-primary-400 text-white"
