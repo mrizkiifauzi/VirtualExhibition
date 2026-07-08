@@ -41,6 +41,30 @@ export default function ManageRooms() {
     }
   };
 
+    const removeFrame = async (id, frame) => {
+  setSaving(id);
+
+  try {
+    await api.put(`/admin/artworks/${id}/position`, {
+      posisi_3d: null,
+    });
+
+    setArtworks((prev) =>
+      prev.map((a) =>
+        a.id === id
+          ? { ...a, posisi_3d: null }
+          : a
+      )
+    );
+
+    toast.success("Karya dilepas dari frame.");
+    setEditId(null);
+  } catch {
+    toast.error("Gagal melepas karya dari frame.");
+  } finally {
+    setSaving(null);
+  }
+};
  
   return (
     <div className="min-h-screen bg-gray-950 pt-16">
@@ -117,24 +141,36 @@ export default function ManageRooms() {
                       )}
                     </div>
 
-                    <button
-                      onClick={() => setEditId(editId === a.id ? null : a.id)}
-                      className={`text-sm px-4 py-2 rounded-lg transition-all ${
-                        editId === a.id
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setEditId(editId === a.id ? null : a.id)}
+                        className={`text-sm px-4 py-2 rounded-lg transition-all ${
+                          editId === a.id
                           ? "bg-white/20 text-white"
                           : "btn-secondary"
-                      }`}
-                    >
-                      {editId === a.id
-                        ? "Tutup"
-                        : a.posisi_3d?.frame
+                        }`}
+                        >
+                        {editId === a.id
+                          ? "Tutup"
+                          : a.posisi_3d?.frame
                           ? "Ubah Frame"
                           : "➕ Pilih Frame"}
-                    </button>
+                      </button>
+                          {a.posisi_3d?.frame && (
+                            <button
+                              onClick={() => removeFrame(a.id)}
+                              className="text-sm px-4 py-2 rounded-lg transition-all bg-red-600 text-white hover:bg-red-700"
+                            >
+                              ❌ Lepas dari Frame
+                            </button>
+                          )}
+                    </div>
+                    
                   </div>
 
                   {editId === a.id && (
                     <div className="border-t border-white/10 p-5 bg-white/[0.02]">
+                      
                       <p className="text-xs font-medium text-white/50 mb-3">
                         Pilih slot frame 1–27:
                       </p>

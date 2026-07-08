@@ -116,15 +116,6 @@ export default function VirtualRoom({ artworks, onArtworkClick }) {
     [visibleArtworks],
   );
 
-  useEffect(() => {
-    preloadArtwork(roomModelUrl, "3d");
-    visibleArtworks.forEach((artwork) => {
-      const url = artwork.thumbnail || artwork.file_path;
-      const type = artwork.thumbnail ? "image" : artwork.tipe;
-      preloadArtwork(url, type);
-    });
-  }, [visibleArtworks]);
-
   return (
     <div className="w-full h-full relative">
       <Canvas
@@ -168,25 +159,7 @@ export default function VirtualRoom({ artworks, onArtworkClick }) {
           </ErrorBoundary>
           <PlayerControls colliders={colliders} />
 
-          {artworkPositions.map(({ artwork, position, rotation }) => (
-            <ErrorBoundary
-              key={artwork.id}
-              fallback={
-                <Html position={position} center>
-                  <div className="bg-black/70 text-white rounded-xl border border-white/10 px-3 py-2 text-xs">
-                    Karya gagal dimuat
-                  </div>
-                </Html>
-              }
-            >
-              <ArtworkFrame
-                artwork={artwork}
-                position={position}
-                rotation={rotation}
-                onClick={() => onArtworkClick(artwork)}
-              />
-            </ErrorBoundary>
-          ))}
+          
         </Suspense>
       </Canvas>
 
