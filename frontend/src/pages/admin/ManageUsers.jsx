@@ -1,67 +1,98 @@
-import { useState, useEffect } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import Navbar from '../../components/common/Navbar'
-import api from '../../api/axios'
-import toast from 'react-hot-toast'
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import Navbar from "../../components/common/Navbar";
+import api from "../../api/axios";
+import toast from "react-hot-toast";
 
-const ROLES = ['pengunjung', 'mahasiswa', 'admin']
-const roleColor = { pengunjung: 'text-white/60', mahasiswa: 'text-primary-400', admin: 'text-red-400' }
+const ROLES = ["pengunjung", "mahasiswa", "admin"];
+const roleColor = {
+  pengunjung: "text-white/60",
+  mahasiswa: "text-primary-400",
+  admin: "text-red-400",
+};
 
 export default function ManageUsers() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [users, setUsers]   = useState([])
-  const [meta, setMeta]     = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [users, setUsers] = useState([]);
+  const [meta, setMeta] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const role   = searchParams.get('role')   || ''
-  const search = searchParams.get('search') || ''
-  const page   = searchParams.get('page')   || 1
+  const role = searchParams.get("role") || "";
+  const search = searchParams.get("search") || "";
+  const page = searchParams.get("page") || 1;
 
   const load = () => {
-    setLoading(true)
-    const p = new URLSearchParams()
-    if (role)   p.set('role', role)
-    if (search) p.set('search', search)
-    p.set('page', page)
-    api.get(`/admin/users?${p}`)
-      .then(({ data }) => { setUsers(data.data || []); setMeta(data.meta || data) })
-      .finally(() => setLoading(false))
-  }
+    setLoading(true);
+    const p = new URLSearchParams();
+    if (role) p.set("role", role);
+    if (search) p.set("search", search);
+    p.set("page", page);
+    api
+      .get(`/admin/users?${p}`)
+      .then(({ data }) => {
+        setUsers(data.data || []);
+        setMeta(data.meta || data);
+      })
+      .finally(() => setLoading(false));
+  };
 
-  useEffect(load, [role, search, page])
+  useEffect(load, [role, search, page]);
 
   const setParam = (key, val) => {
-    const p = new URLSearchParams(searchParams)
-    if (val) p.set(key, val); else p.delete(key)
-    p.delete('page')
-    setSearchParams(p)
-  }
+    const p = new URLSearchParams(searchParams);
+    if (val) p.set(key, val);
+    else p.delete(key);
+    p.delete("page");
+    setSearchParams(p);
+  };
 
   const updateRole = async (id, newRole) => {
     try {
-      await api.put(`/admin/users/${id}/role`, { role: newRole })
-      setUsers(prev => prev.map(u => u.id_user === id ? { ...u, role: newRole } : u))
-      toast.success('Role berhasil diubah!')
-    } catch { toast.error('Gagal mengubah role') }
-  }
-
-  const deleteUser = async (id, name) => {
-    if (!confirm(`Hapus pengguna "${name}"?`)) return
-    try {
-      await api.delete(`/admin/users/${id}`)
-      setUsers(prev => prev.filter(u => u.id_user !== id))
-      toast.success('Pengguna dihapus')
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal menghapus pengguna')
+      await api.put(`/admin/users/${id}/role`, { role: newRole });
+      setUsers((prev) =>
+        prev.map((u) => (u.id_user === id ? { ...u, role: newRole } : u)),
+      );
+      toast.success("Role berhasil diubah!");
+    } catch {
+      toast.error("Gagal mengubah role");
     }
-  }
+  };
+
+  const openDeleteModal = (user) => {
+    setDeleteTarget(user);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteTarget(null);
+  };
+
+  const deleteUser = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      await api.delete(`/admin/users/${deleteTarget.id_user}`);
+      setUsers((prev) =>
+        prev.filter((u) => u.id_user !== deleteTarget.id_user),
+      );
+      toast.success("Pengguna dihapus");
+      closeDeleteModal();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Gagal menghapus pengguna");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-950 pt-16">
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-center gap-4 mb-8">
-          <Link to="/admin" className="text-white/40 hover:text-white text-sm">← Admin Panel</Link>
+          <Link to="/admin" className="text-white/40 hover:text-white text-sm">
+            ← Admin Panel
+          </Link>
           <h1 className="text-2xl font-bold text-white">Kelola Pengguna</h1>
         </div>
 
@@ -71,19 +102,21 @@ export default function ManageUsers() {
             defaultValue={search}
             placeholder="Cari nama pengguna..."
             className="input text-sm flex-1 min-w-[200px]"
-            onKeyDown={e => e.key === 'Enter' && setParam('search', e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && setParam("search", e.target.value)
+            }
           />
-          {['', ...ROLES].map(r => (
+          {["", ...ROLES].map((r) => (
             <button
               key={r}
-              onClick={() => setParam('role', r)}
+              onClick={() => setParam("role", r)}
               className={`text-sm px-4 py-2 rounded-lg transition-all capitalize ${
                 role === r
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white/10 text-white/60 hover:bg-white/20'
+                  ? "bg-primary-600 text-white"
+                  : "bg-white/10 text-white/60 hover:bg-white/20"
               }`}
             >
-              {r || 'Semua'}
+              {r || "Semua"}
             </button>
           ))}
         </div>
@@ -91,7 +124,9 @@ export default function ManageUsers() {
         {/* User list */}
         {loading ? (
           <div className="space-y-3">
-            {[...Array(6)].map((_, i) => <div key={i} className="card h-16 animate-pulse" />)}
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="card h-16 animate-pulse" />
+            ))}
           </div>
         ) : users.length === 0 ? (
           <div className="card p-12 text-center">
@@ -100,7 +135,7 @@ export default function ManageUsers() {
           </div>
         ) : (
           <div className="space-y-3">
-            {users.map(u => (
+            {users.map((u) => (
               <div key={u.id_user} className="card p-4 flex items-center gap-4">
                 {/* Avatar */}
                 <div className="w-12 h-12 bg-primary-600/70 rounded-xl flex items-center justify-center text-lg font-bold text-white shrink-0">
@@ -111,31 +146,45 @@ export default function ManageUsers() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="font-medium text-white">{u.name}</span>
-                    <span className={`text-xs font-medium capitalize ${roleColor[u.role]}`}>({u.role})</span>
+                    <span
+                      className={`text-xs font-medium capitalize ${roleColor[u.role]}`}
+                    >
+                      ({u.role})
+                    </span>
                   </div>
                   <p className="text-xs text-white/40">{u.email}</p>
                   <p className="text-xs text-white/30 mt-0.5">
                     {u.nim && <span>NIM: {u.nim} · </span>}
-                    {u.program_studi?.nama_prodi && <span>{u.program_studi.nama_prodi} · </span>}
-                    {u.artworks_count || 0} karya
+                    {u.program_studi?.nama_prodi && (
+                      <span>{u.program_studi.nama_prodi} · </span>
+                    )}
+                    {u.role !== "admin" && (
+                      <span>{u.artworks_count || 0} karya</span>
+                    )}
                   </p>
                 </div>
 
                 {/* Role changer */}
                 <select
                   value={u.role}
-                  onChange={e => updateRole(u.id_user, e.target.value)}
+                  onChange={(e) => updateRole(u.id_user, e.target.value)}
                   className="input text-sm w-auto min-w-[140px] shrink-0"
                 >
-                  {ROLES.map(r => (
-                    <option key={r} value={r} className="capitalize text-black ">{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                  {ROLES.map((r) => (
+                    <option
+                      key={r}
+                      value={r}
+                      className="capitalize text-black "
+                    >
+                      {r.charAt(0).toUpperCase() + r.slice(1)}
+                    </option>
                   ))}
                 </select>
 
                 {/* Delete */}
-                {u.role !== 'admin' && (
+                {u.role !== "admin" && (
                   <button
-                    onClick={() => deleteUser(u.id_user, u.name)}
+                    onClick={() => openDeleteModal(u)}
                     className="btn-danger text-xs py-1.5 px-3 shrink-0"
                   >
                     🗑️ Hapus
@@ -152,11 +201,11 @@ export default function ManageUsers() {
             {[...Array(meta.last_page)].map((_, i) => (
               <button
                 key={i}
-                onClick={() => setParam('page', i + 1)}
+                onClick={() => setParam("page", i + 1)}
                 className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
                   meta.current_page === i + 1
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-white/10 text-white/60 hover:bg-white/20'
+                    ? "bg-primary-600 text-white"
+                    : "bg-white/10 text-white/60 hover:bg-white/20"
                 }`}
               >
                 {i + 1}
@@ -165,6 +214,49 @@ export default function ManageUsers() {
           </div>
         )}
       </div>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-slate-950 border border-slate-700 shadow-2xl overflow-hidden">
+            <div className="border-b border-slate-700 px-6 py-5">
+              <h2 className="text-lg font-semibold text-white">
+                Hapus Pengguna
+              </h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-slate-300">
+                Apakah Anda yakin ingin menghapus pengguna
+                <span className="font-medium text-white">
+                  {" "}
+                  {deleteTarget.name}
+                </span>
+                ?
+              </p>
+              <p className="text-sm text-slate-400">
+                Aksi ini akan menghapus akses pengguna dan tidak dapat
+                dikembalikan.
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-3 border-t border-slate-700 px-6 py-4 bg-slate-950">
+              <button
+                type="button"
+                onClick={closeDeleteModal}
+                className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-slate-300 hover:border-slate-500"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={deleteUser}
+                disabled={deleteLoading}
+                className="rounded-2xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deleteLoading ? "Menghapus..." : "Hapus"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )
+  );
 }
