@@ -28,6 +28,8 @@ export default function ManageArtworks() {
   const [rejectTarget, setRejectTarget] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectLoading, setRejectLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const status = searchParams.get("status") || "";
   const search = searchParams.get("search") || "";
@@ -106,14 +108,26 @@ export default function ManageArtworks() {
     }
   };
 
-  const deleteArtwork = async (id) => {
-    if (!confirm("Hapus karya ini permanen?")) return;
+  const openDeleteModal = (artwork) => {
+    setDeleteTarget(artwork);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteTarget(null);
+  };
+
+  const deleteArtwork = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
-      await api.delete(`/admin/artworks/${id}`);
+      await api.delete(`/admin/artworks/${deleteTarget.id}`);
       toast.success("Karya dihapus");
-      setArtworks((prev) => prev.filter((a) => a.id !== id));
+      setArtworks((prev) => prev.filter((a) => a.id !== deleteTarget.id));
+      closeDeleteModal();
     } catch {
       toast.error("Gagal menghapus karya");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -238,7 +252,7 @@ export default function ManageArtworks() {
                       ✅ Verifikasi
                     </button>
                   )}
-                  {a.status !== "rejected" && (
+                  {a.status === "pending" && (
                     <button
                       onClick={() => openRejectModal(a)}
                       className="bg-yellow-600 hover:bg-yellow-700 text-white text-xs py-1.5 px-3 rounded-lg transition-all"
@@ -247,7 +261,7 @@ export default function ManageArtworks() {
                     </button>
                   )}
                   <button
-                    onClick={() => deleteArtwork(a.id)}
+                    onClick={() => openDeleteModal(a)}
                     className="btn-danger text-xs py-1.5 px-3"
                   >
                     🗑️ Hapus
@@ -312,6 +326,47 @@ export default function ManageArtworks() {
                 className="rounded-2xl bg-yellow-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-yellow-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {rejectLoading ? "Mengirim..." : "Kirim"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-3xl bg-slate-950 border border-slate-700 shadow-2xl overflow-hidden">
+            <div className="border-b border-slate-700 px-6 py-5">
+              <h2 className="text-lg font-semibold text-white">Hapus Karya</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-slate-300">
+                Karya "
+                <span className="font-medium text-white">
+                  {deleteTarget.judul}
+                </span>
+                " akan dihapus secara permanen.
+              </p>
+              <p className="text-sm text-slate-400">
+                Tindakan ini tidak dapat dibatalkan. Pastikan Anda sudah yakin
+                sebelum melanjutkan.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 border-t border-slate-700 px-6 py-4 bg-slate-950">
+              <button
+                type="button"
+                onClick={closeDeleteModal}
+                className="rounded-2xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-slate-300 hover:border-slate-500"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={deleteArtwork}
+                disabled={deleteLoading}
+                className="rounded-2xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deleteLoading ? "Menghapus..." : "Hapus"}
               </button>
             </div>
           </div>

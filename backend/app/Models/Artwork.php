@@ -19,7 +19,6 @@ class Artwork extends Model
         'file_path',
         'thumbnail',
         'status',
-        'posisi_3d',
     ];
 
     protected $casts = [

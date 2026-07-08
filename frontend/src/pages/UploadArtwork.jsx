@@ -13,7 +13,6 @@ export default function UploadArtwork() {
     judul: "",
     deskripsi: "",
     tipe: "image",
-    id_prodi: user?.id_prodi || "",
   });
   const [file, setFile] = useState(null);
   const [thumb, setThumb] = useState(null);
@@ -104,7 +103,9 @@ export default function UploadArtwork() {
     fd.append("judul", form.judul);
     fd.append("deskripsi", form.deskripsi);
     fd.append("tipe", form.tipe);
-    // fd.append("id_prodi", form.id_prodi || "");
+    if (user?.id_prodi) {
+      fd.append("id_prodi", user.id_prodi);
+    }
     fd.append("file", file);
     if (thumb) fd.append("thumbnail", thumb);
 
@@ -189,23 +190,6 @@ export default function UploadArtwork() {
                 placeholder="Ceritakan tentang karya Anda..."
               />
             </div>
-
-            {/* ── Program Studi ── */}
-            {/* <div>
-              <label className="label">Program Studi</label>
-              <select
-                value={form.id_prodi}
-                onChange={(e) => setForm({ ...form, id_prodi: e.target.value })}
-                className="input"
-              >
-                <option value="">Pilih Program Studi</option>
-                {prodis.map((p) => (
-                  <option key={p.id_prodi} value={p.id_prodi}>
-                    {p.nama_prodi}
-                  </option>
-                ))}
-              </select>
-            </div> */}
 
             {/* ── File Upload ──
                   FIXED: input is hidden via ref, NOT via absolute positioning.
