@@ -162,12 +162,12 @@ export default function Login() {
           </button> */}
 
           {/* Demo accounts */}
-          <div className="mt-5 p-3 bg-primary-900/20 border border-primary-500/20 rounded-xl text-xs text-white/50 space-y-1">
+          {/* <div className="mt-5 p-3 bg-primary-900/20 border border-primary-500/20 rounded-xl text-xs text-white/50 space-y-1">
             <p className="font-medium text-primary-400 mb-2">Akun Demo:</p>
             <p>Admin: admin@exhibition.id / admin123</p>
             <p>Mahasiswa: mahasiswa@exhibition.id / password123</p>
             <p>Pengunjung: pengunjung@exhibition.id / password123</p>
-          </div>
+          </div> */}
         </div>
 
         <p className="text-center text-sm text-white/50 mt-6">
