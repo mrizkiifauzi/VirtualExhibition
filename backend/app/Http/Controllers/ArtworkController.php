@@ -73,7 +73,7 @@ class ArtworkController extends Controller
     public function show($id)
     {
         $artwork = Artwork::with([
-            'user:id_user,name,nim,foto_profil',
+            'user:id_user,name,nim',
             'user.programStudi:id_prodi,nama_prodi',
             'programStudi:id_prodi,nama_prodi'
         ])

@@ -20,7 +20,6 @@ class User extends Authenticatable
         'role',
         'nim',
         'id_prodi',
-        'foto_profil',
     ];
 
     protected $hidden = ['password', 'remember_token'];

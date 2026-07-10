@@ -15,7 +15,6 @@ class Artwork extends Model
         'judul',
         'deskripsi',
         'tipe',
-        'tahun',
         'file_path',
         'thumbnail',
         'status',

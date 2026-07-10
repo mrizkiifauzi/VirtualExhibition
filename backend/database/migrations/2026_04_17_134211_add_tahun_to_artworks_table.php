@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('artworks', function (Blueprint $table) {
-            $table->year('tahun')->nullable()->after('tipe');
-        });
+        // This migration is now obsolete because the 'tahun' column is no longer used.
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('artworks', function (Blueprint $table) {
-            $table->dropColumn('tahun');
-        });
+        // No rollback action necessary for the obsolete migration.
     }
 };

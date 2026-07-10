@@ -18,10 +18,12 @@ return new class extends Migration {
             $table->enum('role', ['pengunjung', 'mahasiswa', 'admin'])->default('pengunjung');
             $table->string('nim', 20)->nullable();
             $table->unsignedBigInteger('id_prodi')->nullable();
-            $table->string('foto_profil')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
     }
-    public function down(): void { Schema::dropIfExists('users'); }
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+    }
 };

@@ -10,10 +10,10 @@ class CommentController extends Controller
 {
     public function index($id)
     {
-        $comments = Comment::with('user:id_user,name,foto_profil')
-                           ->where('artwork_id', $id)
-                           ->latest()
-                           ->paginate(20);
+        $comments = Comment::with('user:id_user,name')
+            ->where('artwork_id', $id)
+            ->latest()
+            ->paginate(20);
 
         return response()->json($comments);
     }
@@ -33,7 +33,7 @@ class CommentController extends Controller
             'isi'        => $request->isi,
         ]);
 
-        $comment->load('user:id_user,name,foto_profil');
+        $comment->load('user:id_user,name');
 
         return response()->json(['message' => 'Komentar berhasil ditambahkan.', 'comment' => $comment], 201);
     }

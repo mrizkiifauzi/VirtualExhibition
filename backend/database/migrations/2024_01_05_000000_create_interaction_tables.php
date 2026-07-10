@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,7 +33,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_user');
             $table->unsignedBigInteger('artwork_id');
             $table->text('isi');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
             $table->foreign('id_user')->references('id_user')->on('users')->cascadeOnDelete();
             $table->foreign('artwork_id')->references('id')->on('artworks')->cascadeOnDelete();
         });
