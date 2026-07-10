@@ -48,10 +48,7 @@ function CanvasFallback() {
   );
 }
 
-function RoomScene({
-    setColliders,
-    artworks
-}) {
+function RoomScene({ setColliders, artworks, onArtworkClick }) {
   const { scene } = useGLTF(roomModelUrl);
 
   useEffect(() => {
@@ -69,22 +66,39 @@ function RoomScene({
     setColliders(colliderList);
   }, [scene, setColliders]);
 
+  const handleSceneClick = (event) => {
+    if (!onArtworkClick) return;
+
+    const artwork = event.intersections
+      ?.map((intersection) => {
+        let current = intersection.object;
+        while (current) {
+          if (current.userData?.artwork) return current.userData.artwork;
+          current = current.parent;
+        }
+        return null;
+      })
+      .find(Boolean);
+
+    if (artwork) {
+      event.stopPropagation?.();
+      onArtworkClick(artwork);
+    }
+  };
+
   return (
     <>
-        <primitive
-            object={scene}
-            scale={[1,1,1]}
-            position={[0,0,0]}
-            rotation={[0,0,0]}
-        />
+      <primitive
+        object={scene}
+        scale={[1, 1, 1]}
+        position={[0, 0, 0]}
+        rotation={[0, 0, 0]}
+        onClick={handleSceneClick}
+      />
 
-        <FrameManager
-            scene={scene}
-            artworks={artworks}
-            
-        />
+      <FrameManager scene={scene} artworks={artworks} />
     </>
-);
+  );
 }
 
 export default function VirtualRoom({ artworks, onArtworkClick }) {
@@ -155,8 +169,10 @@ export default function VirtualRoom({ artworks, onArtworkClick }) {
 
           <ErrorBoundary>
             <RoomScene
-          setColliders={setColliders}
-          artworks={visibleArtworks}/>
+              setColliders={setColliders}
+              artworks={visibleArtworks}
+              onArtworkClick={onArtworkClick}
+            />
           </ErrorBoundary>
           <PlayerControls colliders={colliders} onPointerLockChange={setIsExploring} />
 

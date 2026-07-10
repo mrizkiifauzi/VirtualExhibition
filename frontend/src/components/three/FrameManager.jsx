@@ -78,6 +78,9 @@ export default function FrameManager({ scene, artworks }) {
         return;
       }
 
+      frame.userData.artwork = artwork;
+      frame.userData.frameName = frameNames[0];
+
       const mediaUrl = buildMediaUrl(artwork.thumbnail || artwork.file_path);
       if (!mediaUrl) return;
 
