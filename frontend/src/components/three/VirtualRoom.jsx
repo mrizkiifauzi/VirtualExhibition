@@ -89,6 +89,7 @@ function RoomScene({
 
 export default function VirtualRoom({ artworks, onArtworkClick }) {
   const [colliders, setColliders] = useState([]);
+  const [isExploring, setIsExploring] = useState(false);
   const visibleArtworks = useMemo(
     () =>
       (artworks || []).filter(
@@ -157,11 +158,20 @@ export default function VirtualRoom({ artworks, onArtworkClick }) {
           setColliders={setColliders}
           artworks={visibleArtworks}/>
           </ErrorBoundary>
-          <PlayerControls colliders={colliders} />
+          <PlayerControls colliders={colliders} onPointerLockChange={setIsExploring} />
 
           
         </Suspense>
       </Canvas>
+
+      {isExploring && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="relative h-6 w-6">
+            <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-black/90" />
+            <div className="absolute left-0 top-1/2 w-full h-[2px] -translate-y-1/2 bg-black/90" />
+          </div>
+        </div>
+      )}
 
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white/70 text-xs px-4 py-2 rounded-full flex items-center gap-4">
         <span>⌨️ WASD — Gerak</span>

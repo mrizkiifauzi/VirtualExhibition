@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export default function PlayerControls({ colliders }) {
+export default function PlayerControls({ colliders, onPointerLockChange }) {
   const { camera, gl } = useThree()
   const keys   = useRef({})
   const yaw    = useRef(0)
@@ -25,7 +25,9 @@ export default function PlayerControls({ colliders }) {
     }
 
     const onLockChange = () => {
-      locked.current = document.pointerLockElement === canvas
+      const isLocked = document.pointerLockElement === canvas
+      locked.current = isLocked
+      onPointerLockChange?.(isLocked)
     }
 
     const onClick = () => {
@@ -46,7 +48,7 @@ export default function PlayerControls({ colliders }) {
       document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('pointerlockchange', onLockChange)
     }
-  }, [gl])
+  }, [gl, onPointerLockChange])
 
   useFrame((_, delta) => {
     const speed = keys.current['ShiftLeft'] ? 8 : 4
