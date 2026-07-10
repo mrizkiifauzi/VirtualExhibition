@@ -7,6 +7,23 @@ import { useState } from "react";
 
 const API_URL = "http://localhost:8000";
 
+function buildMediaUrl(path) {
+  if (!path) return null;
+
+  const normalized = String(path).trim();
+  if (!normalized) return null;
+  if (normalized.startsWith("http")) return normalized;
+
+  return `${API_URL}/${normalized.replace(/^\/+/, "")}`;
+}
+
+function isVideoArtwork(artwork) {
+  const type = `${artwork?.tipe || artwork?.type || ""}`.toLowerCase();
+  const filePath = `${artwork?.file_path || artwork?.thumbnail || ""}`.toLowerCase();
+
+  return type === "video" || /\.(mp4|webm|ogg|mov)$/i.test(filePath);
+}
+
 export default function ArtworkPopup({ artwork, onClose }) {
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -14,11 +31,9 @@ export default function ArtworkPopup({ artwork, onClose }) {
 
   if (!artwork) return null;
 
-  const thumb = artwork.thumbnail
-    ? `${API_URL}/${artwork.thumbnail}`
-    : artwork.tipe === "image"
-      ? `${API_URL}/${artwork.file_path}`
-      : null;
+  const isVideo = isVideoArtwork(artwork);
+  const mediaUrl = buildMediaUrl(artwork.thumbnail || artwork.file_path);
+  const thumb = mediaUrl && !isVideo ? mediaUrl : null;
 
   return (
     <>
@@ -37,14 +52,26 @@ export default function ArtworkPopup({ artwork, onClose }) {
             ✕
           </button>
 
-          {/* Image */}
-          {thumb && (
+          {/* Media */}
+          {(thumb || isVideo) && (
             <div className="aspect-video bg-gray-900 overflow-hidden rounded-t-2xl">
-              <img
-                src={thumb}
-                alt={artwork.judul}
-                className="w-full h-full object-cover"
-              />
+              {isVideo ? (
+                <video
+                  src={mediaUrl}
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover bg-black"
+                />
+              ) : (
+                <img
+                  src={thumb}
+                  alt={artwork.judul}
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
           )}
 
@@ -109,7 +136,7 @@ export default function ArtworkPopup({ artwork, onClose }) {
               <button
                 onClick={() => {
                   onClose();
-                  navigate(`/artworks/${artwork.id}`);
+                  window.open(`/artworks/${artwork.id}`, "_blank", "noopener,noreferrer");
                 }}
                 className="btn-primary flex-1"
               >
