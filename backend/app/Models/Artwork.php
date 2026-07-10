@@ -17,6 +17,7 @@ class Artwork extends Model
         'tipe',
         'file_path',
         'thumbnail',
+        'posisi_3d',
         'status',
     ];
 
