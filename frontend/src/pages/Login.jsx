@@ -4,6 +4,7 @@ import api from "../api/axios";
 import useAuthStore from "../store/authStore";
 import toast from "react-hot-toast";
 import Navbar from "../components/common/Navbar";
+import logoPolibatam from "../assets/img/2 - Logo Polibatam.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -44,8 +45,8 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold">
-              VE
+            <div className="w-12 h-10 flex items-center justify-center">
+              <img src={logoPolibatam} alt="Polibatam" />
             </div>
             <span className="text-xl font-bold text-white">
               Virtual Exhibition
@@ -120,6 +121,17 @@ export default function Login() {
             >
               {loading ? "Memproses..." : "Masuk"}
             </button>
+
+            <div className="mt-6 border-t border-white/10 pt-6 text-center">
+              <p className="text-white/50">Belum punya akun?</p>
+
+              <Link
+                to="/register"
+                className="text-primary-400 hover:text-primary-300 font-semibold"
+              >
+                Daftar Sekarang
+              </Link>
+            </div>
           </form>
 
           {/* Divider */}
@@ -170,7 +182,7 @@ export default function Login() {
           </div> */}
         </div>
 
-        <p className="text-center text-sm text-white/50 mt-6">
+        {/* <p className="text-center text-sm text-white/50 mt-6">
           Belum punya akun?{" "}
           <Link
             to="/register"
@@ -178,7 +190,7 @@ export default function Login() {
           >
             Daftar sekarang
           </Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );

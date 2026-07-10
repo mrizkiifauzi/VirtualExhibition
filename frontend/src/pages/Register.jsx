@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import useAuthStore from "../store/authStore";
 import toast from "react-hot-toast";
+import logoPolibatam from "../assets/img/2 - Logo Polibatam.png";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -53,9 +54,11 @@ export default function Register() {
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold">
-              VE
-            </div>
+            <img
+              src={logoPolibatam}
+              alt="Polibatam"
+              className="w-16 h-16 object-contain mx-auto"
+            />
             <span className="text-xl font-bold text-white">
               Virtual Exhibition
             </span>
@@ -79,7 +82,17 @@ export default function Register() {
           </Link>
         </p>
 
-        <div className="card p-8">
+        <div
+          className="
+      backdrop-blur-xl
+      bg-white/5
+      border
+      border-white/10
+      rounded-3xl
+      p-8
+      shadow-2xl
+      "
+        >
           <form onSubmit={submit} className="space-y-4">
             <div>
               <label className="label">Nama Lengkap</label>
@@ -112,21 +125,37 @@ export default function Register() {
               )}
             </div>
 
-            <div>
-              <label className="label">Daftar Sebagai</label>
-              <select
-                name="role"
-                value={form.role}
-                onChange={handle}
-                className="input"
+            <label className="label">Daftar Sebagai</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, role: "pengunjung" })}
+                className={`
+            p-4 rounded-xl border transition
+            ${
+              form.role === "pengunjung"
+                ? "bg-cyan-500/20 border-cyan-500"
+                : "bg-white/5 border-white/10"
+            }
+          `}
               >
-                <option value="pengunjung" className="text-black">
-                  Pengunjung
-                </option>
-                <option value="mahasiswa" className="text-black">
-                  Mahasiswa
-                </option>
-              </select>
+                Pengunjung
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, role: "mahasiswa" })}
+                className={`
+            p-4 rounded-xl border transition
+            ${
+              form.role === "mahasiswa"
+                ? "bg-cyan-500/20 border-cyan-500"
+                : "bg-white/5 border-white/10"
+            }
+          `}
+              >
+                Mahasiswa
+              </button>
             </div>
 
             {form.role === "mahasiswa" && (

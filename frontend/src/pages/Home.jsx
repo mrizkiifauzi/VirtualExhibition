@@ -176,7 +176,7 @@ export default function Home() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30 animate-bounce">
+        <div className="absolute bottom-8 flex flex-col items-center gap-2 text-white/30 animate-bounce">
           <span className="text-xs">Scroll</span>
           <svg
             className="w-4 h-4"
@@ -230,42 +230,53 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery per Jurusan */}
-      {/* {prodis.map((prodi, idx) => {
-        const config = JURUSAN[idx] || JURUSAN[0]
-        const karya  = artworksByProdi[prodi.id_prodi] || []
-        return (
-          <section key={prodi.id_prodi} className="py-16 px-4">
-            <div className="max-w-7xl mx-auto">
-              <div className={`bg-gradient-to-r ${config.color} border ${config.border} rounded-2xl p-6 mb-8`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl">{config.icon}</span>
-                    <div>
-                      <h2 className="text-xl font-bold text-white">{prodi.nama_prodi}</h2>
-                      <p className="text-sm text-white/50">{prodi.jenjang} · {prodi.artworks_count || 0} karya</p>
-                    </div>
-                  </div>
-                  <Link
-                    to={`/gallery?id_prodi=${prodi.id_prodi}`}
-                    className="btn-secondary text-sm py-1.5 px-4"
-                  >
-                    Lihat Semua →
-                  </Link>
-                </div>
-              </div>
+      {/* Benefits */}
+      <section className="py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-white">
+              Mengapa Virtual Exhibition?
+            </h2>
 
-              {karya.length === 0 ? (
-                <div className="text-center text-white/30 py-10">Belum ada karya dari jurusan ini</div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {karya.map(a => <ArtworkCard key={a.id} artwork={a} />)}
-                </div>
-              )}
+            <p className="text-white/50 mt-4">
+              Platform digital untuk menampilkan inovasi dan kreativitas
+              mahasiswa.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="card p-8 text-center">
+              <div className="text-5xl mb-4">🏛️</div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Pameran Virtual
+              </h3>
+              <p className="text-white/50">
+                Jelajahi karya dalam ruang pamer digital interaktif.
+              </p>
             </div>
-          </section>
-        )
-      })} */}
+
+            <div className="card p-8 text-center">
+              <div className="text-5xl mb-4">🎨</div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Showcase Karya
+              </h3>
+              <p className="text-white/50">
+                Publikasikan karya terbaik kepada publik.
+              </p>
+            </div>
+
+            <div className="card p-8 text-center">
+              <div className="text-5xl mb-4">🚀</div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Portofolio Digital
+              </h3>
+              <p className="text-white/50">
+                Bangun rekam jejak profesional sejak masa kuliah.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA */}
       {!isAdmin() && (
